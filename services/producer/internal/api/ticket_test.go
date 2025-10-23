@@ -33,50 +33,35 @@ func TestTicketAPI_CreateTicket(t *testing.T) {
 		requestBody    any
 		serviceError   error
 		expectedStatus int
-		checkBody      func(t *testing.T, body *bytes.Buffer)
+		expectedBody   map[string]any
 	}{
 		{
 			name:           "successfully creates ticket",
 			requestBody:    map[string]any{"id": "123", "title": "Concert Ticket", "price": 50.00},
 			serviceError:   nil,
 			expectedStatus: http.StatusCreated,
-			checkBody: func(t *testing.T, body *bytes.Buffer) {
-				var responseBody map[string]any
-				err := json.Unmarshal(body.Bytes(), &responseBody)
-				require.NoError(t, err)
-				require.Equal(t, "123", responseBody["id"])
-				require.Equal(t, "Concert Ticket", responseBody["title"])
-				require.Equal(t, 50.00, responseBody["price"])
-				require.NotEmpty(t, responseBody["created_at"])
-			},
+			expectedBody:   map[string]any{"id": "123", "title": "Concert Ticket", "price": 50.00},
 		},
 		{
 			name:           "invalid JSON returns 400",
 			requestBody:    []byte(`{"id":"123","title":}`),
 			serviceError:   nil,
 			expectedStatus: http.StatusBadRequest,
-			checkBody:      func(t *testing.T, body *bytes.Buffer) {},
+			expectedBody:   nil,
 		},
 		{
 			name:           "service error returns 500",
 			requestBody:    map[string]any{"id": "456", "title": "Sports Ticket", "price": 75.50},
 			serviceError:   errors.New("service error"),
 			expectedStatus: http.StatusInternalServerError,
-			checkBody:      func(t *testing.T, body *bytes.Buffer) {},
+			expectedBody:   nil,
 		},
 		{
 			name:           "missing fields still processes",
 			requestBody:    map[string]any{"title": "Movie Ticket"},
 			serviceError:   nil,
 			expectedStatus: http.StatusCreated,
-			checkBody: func(t *testing.T, body *bytes.Buffer) {
-				var responseBody map[string]any
-				err := json.Unmarshal(body.Bytes(), &responseBody)
-				require.NoError(t, err)
-				require.Equal(t, "Movie Ticket", responseBody["title"])
-				require.Equal(t, 0.0, responseBody["price"])
-				require.NotEmpty(t, responseBody["created_at"])
-			},
+			expectedBody:   map[string]any{"title": "Movie Ticket", "price": 0.0},
 		},
 	}
 
@@ -100,8 +85,17 @@ func TestTicketAPI_CreateTicket(t *testing.T) {
 			ctx.Request.Header.Set("Content-Type", "application/json")
 
 			ticketAPI.CreateTicket(ctx)
+
 			require.Equal(t, tt.expectedStatus, w.Code)
-			tt.checkBody(t, w.Body)
+
+			if tt.expectedBody != nil {
+				responseBody := map[string]any{}
+				err := json.Unmarshal(w.Body.Bytes(), &responseBody)
+				require.NoError(t, err)
+
+				delete(responseBody, "created_at")
+				require.EqualValues(t, tt.expectedBody, responseBody)
+			}
 		})
 	}
 }
