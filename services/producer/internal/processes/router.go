@@ -1,4 +1,4 @@
-package router
+package processes
 
 import (
 	"context"
@@ -6,14 +6,14 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/iamnotrodger/golang-kafka/producer/api"
+	"github.com/iamnotrodger/golang-kafka/services/producer/internal/api"
 )
 
 type Router struct {
 	server *http.Server
 }
 
-func NewRouter() *Router {
+func NewRouter(appContext *ApplicationContext) *Router {
 	engine := gin.New()
 
 	// g.Use(gin.LoggerWithFormatter(logFormatter), gin.Recovery(), gerror.Handler(), location.Default())

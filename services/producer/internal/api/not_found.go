@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/iamnotrodger/golang-kafka/producer/model"
+	"github.com/iamnotrodger/golang-kafka/services/producer/internal/model"
 )
 
 func NotFound() gin.HandlerFunc {

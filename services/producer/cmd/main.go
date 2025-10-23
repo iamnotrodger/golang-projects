@@ -7,7 +7,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/iamnotrodger/golang-kafka/producer/app"
+	"github.com/iamnotrodger/golang-kafka/services/producer/internal/app"
+	"github.com/iamnotrodger/golang-kafka/services/producer/internal/processes"
 )
 
 func main() {
@@ -15,6 +16,8 @@ func main() {
 }
 
 func run() int {
+	// config.LoadConfig()
+
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
@@ -29,8 +32,8 @@ func run() int {
 	ctx, cancel := context.WithCancel(context.Background())
 	shutdownChan := make(chan struct{})
 
-	appCtx := app.NewApplicationContext(ctx)
-	application := app.NewApplication(app.BuildApplicationProcesses(appCtx))
+	appCtx := processes.NewApplicationContext(ctx)
+	application := app.NewApplication(processes.BuildApplicationProcesses(appCtx))
 	errChan := application.Run(ctx, shutdownChan)
 
 	exitCode := waitForTermination(cancel, shutdownChan, errChan)

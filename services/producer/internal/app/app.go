@@ -4,8 +4,6 @@ import (
 	"context"
 	"log/slog"
 	"sync"
-
-	"github.com/iamnotrodger/golang-kafka/producer/router"
 )
 
 type Runnable interface {
@@ -15,12 +13,6 @@ type Runnable interface {
 type Application struct {
 	processes map[string]Runnable
 	wg        sync.WaitGroup
-}
-
-func BuildApplicationProcesses(appCtx *ApplicationContext) map[string]Runnable {
-	return map[string]Runnable{
-		"Router": router.NewRouter(),
-	}
 }
 
 func NewApplication(processes map[string]Runnable) *Application {
