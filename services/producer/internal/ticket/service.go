@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log/slog"
 
+	"github.com/iamnotrodger/golang-kafka/services/producer/internal/config"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/model"
 	"github.com/segmentio/kafka-go"
 )
@@ -27,6 +28,7 @@ func (t *Service) CreateTicket(ticket *model.Ticket) error {
 	}
 
 	msg := kafka.Message{
+		Topic: config.Global.KafkaTicketTopic,
 		Key:   []byte(ticket.ID),
 		Value: []byte(ticketJSON),
 	}
