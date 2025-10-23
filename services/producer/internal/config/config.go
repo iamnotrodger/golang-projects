@@ -8,6 +8,7 @@ import (
 )
 
 const (
+	defaultEnv              = "development"
 	defaultPort             = 8080
 	defaultLogLevel         = "info"
 	defaultKafkaBroker      = "localhost:9092"
@@ -18,6 +19,7 @@ type Secret struct{}
 
 type Spec struct {
 	*Secret          `json:"-"`
+	Env              string `mapstructure:"env"`
 	Port             int    `mapstructure:"port"`
 	LogLevel         string `mapstructure:"log_level"`
 	KafkaBroker      string `mapstructure:"kafka_broker"`
@@ -28,6 +30,7 @@ func New() *Spec {
 	secret := &Secret{}
 	return &Spec{
 		Secret:           secret,
+		Env:              defaultEnv,
 		Port:             defaultPort,
 		LogLevel:         defaultLogLevel,
 		KafkaBroker:      defaultKafkaBroker,

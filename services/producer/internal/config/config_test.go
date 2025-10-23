@@ -8,6 +8,7 @@ import (
 )
 
 func TestGlobal(t *testing.T) {
+	assert.Equal(t, Global.Env, defaultEnv)
 	assert.Equal(t, Global.Port, defaultPort)
 	assert.Equal(t, Global.LogLevel, defaultLogLevel)
 	assert.Equal(t, Global.KafkaBroker, defaultKafkaBroker)

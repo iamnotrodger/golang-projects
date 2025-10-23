@@ -2,6 +2,7 @@ package processes
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/app"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/config"
@@ -37,5 +38,13 @@ func (a *AppContext) initKafkaWriter() {
 		Addr:                   kafka.TCP(config.Global.KafkaBroker),
 		Balancer:               &kafka.LeastBytes{},
 		AllowAutoTopicCreation: true,
+	}
+
+	if config.Global.Env == "development" {
+		conn, err := kafka.DialLeader(context.Background(), "tcp", config.Global.KafkaBroker, config.Global.KafkaTicketTopic, 0)
+		if err != nil {
+			slog.Error("failed to dial kafka leader and create topic", "error", err)
+		}
+		defer conn.Close()
 	}
 }
