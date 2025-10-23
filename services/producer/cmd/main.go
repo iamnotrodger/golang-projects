@@ -8,6 +8,7 @@ import (
 	"syscall"
 
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/app"
+	"github.com/iamnotrodger/golang-kafka/services/producer/internal/config"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/processes"
 )
 
@@ -16,10 +17,10 @@ func main() {
 }
 
 func run() int {
-	// config.LoadConfig()
+	config.LoadConfig()
 
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelInfo,
+		Level: getLogLevel(),
 		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
 			if a.Key == slog.TimeKey {
 				a.Key = "timestamp"
@@ -65,17 +66,17 @@ func waitForTermination(cancel context.CancelFunc, shutdownChan chan struct{}, e
 	return exitCode
 }
 
-// func getLogLevel() slog.Level {
-// 	switch config.Global.LogLevel {
-// 	case "debug":
-// 		return slog.LevelDebug
-// 	case "info":
-// 		return slog.LevelInfo
-// 	case "warn":
-// 		return slog.LevelWarn
-// 	case "error":
-// 		return slog.LevelError
-// 	default:
-// 		return slog.LevelInfo
-// 	}
-// }
+func getLogLevel() slog.Level {
+	switch config.Global.LogLevel {
+	case "debug":
+		return slog.LevelDebug
+	case "info":
+		return slog.LevelInfo
+	case "warn":
+		return slog.LevelWarn
+	case "error":
+		return slog.LevelError
+	default:
+		return slog.LevelInfo
+	}
+}
