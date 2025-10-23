@@ -4,16 +4,22 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type HealthService interface {
+type healthService interface {
 	Ping() error
 }
 
 type HealthAPI struct {
-	Service HealthService
+	service healthService
+}
+
+func NewHealthAPI(service healthService) *HealthAPI {
+	return &HealthAPI{
+		service: service,
+	}
 }
 
 func (h *HealthAPI) Health(ctx *gin.Context) {
-	if err := h.Service.Ping(); err != nil {
+	if err := h.service.Ping(); err != nil {
 		ctx.JSON(500, gin.H{"status": "unhealthy"})
 		return
 	}

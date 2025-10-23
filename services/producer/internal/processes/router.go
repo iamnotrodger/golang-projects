@@ -23,8 +23,8 @@ func NewRouter(appCtx *AppContext) *Router {
 	// g.Use(gin.LoggerWithFormatter(logFormatter), gin.Recovery(), gerror.Handler(), location.Default())
 	engine.NoRoute(api.NotFound())
 
-	healthHandler := &api.HealthAPI{Service: appCtx.healthService}
-	ticketHandler := &api.TicketAPI{Service: appCtx.ticketService}
+	healthHandler := api.NewHealthAPI(appCtx.healthService)
+	ticketHandler := api.NewTicketAPI(appCtx.ticketService)
 
 	engine.Match([]string{"GET", "HEAD"}, "/health", healthHandler.Health)
 	engine.GET("/metrics", gin.WrapH(promhttp.Handler()))

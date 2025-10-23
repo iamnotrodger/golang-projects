@@ -2,17 +2,17 @@ package health
 
 import "log/slog"
 
-type HealthCheck interface {
+type healthCheck interface {
 	Ping() error
 }
 
 type Service struct {
-	checks map[string]HealthCheck
+	checks map[string]healthCheck
 }
 
 func NewService() *Service {
 	return &Service{
-		checks: map[string]HealthCheck{
+		checks: map[string]healthCheck{
 			"kafka": NewKafkaCheck(),
 		},
 	}

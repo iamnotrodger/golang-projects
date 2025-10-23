@@ -48,13 +48,13 @@ func TestHealthAPI_Health(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockDB := &MockHealthService{
+			mockService := &MockHealthService{
 				PingFunc: func() error {
 					return tt.dbPingError
 				},
 			}
 
-			healthAPI := &HealthAPI{Service: mockDB}
+			healthAPI := NewHealthAPI(mockService)
 
 			w := httptest.NewRecorder()
 			ctx, _ := gin.CreateTestContext(w)

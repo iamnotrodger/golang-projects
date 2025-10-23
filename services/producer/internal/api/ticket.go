@@ -5,12 +5,18 @@ import (
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/model"
 )
 
-type TicketService interface {
+type ticketService interface {
 	CreateTicket(ticket *model.Ticket) error
 }
 
 type TicketAPI struct {
-	Service TicketService
+	service ticketService
+}
+
+func NewTicketAPI(service ticketService) *TicketAPI {
+	return &TicketAPI{
+		service: service,
+	}
 }
 
 func (a *TicketAPI) CreateTicket(ctx *gin.Context) {
@@ -20,7 +26,7 @@ func (a *TicketAPI) CreateTicket(ctx *gin.Context) {
 		return
 	}
 
-	if err := a.Service.CreateTicket(ticket); err != nil {
+	if err := a.service.CreateTicket(ticket); err != nil {
 		ctx.AbortWithError(500, err)
 		return
 	}
