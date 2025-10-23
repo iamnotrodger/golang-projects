@@ -12,11 +12,11 @@ import (
 )
 
 // MockHealthDatabase is a mock implementation of HealthDatabase
-type MockHealthDatabase struct {
+type MockHealthService struct {
 	PingFunc func() error
 }
 
-func (m *MockHealthDatabase) Ping() error {
+func (m *MockHealthService) PingKafka() error {
 	if m.PingFunc != nil {
 		return m.PingFunc()
 	}
@@ -48,13 +48,13 @@ func TestHealthAPI_Health(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockDB := &MockHealthDatabase{
+			mockDB := &MockHealthService{
 				PingFunc: func() error {
 					return tt.dbPingError
 				},
 			}
 
-			healthAPI := &HealthAPI{db: mockDB}
+			healthAPI := &HealthAPI{Service: mockDB}
 
 			w := httptest.NewRecorder()
 			ctx, _ := gin.CreateTestContext(w)

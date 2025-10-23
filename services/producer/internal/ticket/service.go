@@ -9,17 +9,17 @@ import (
 	"github.com/segmentio/kafka-go"
 )
 
-type TicketService struct {
+type Service struct {
 	kafkaWriter *kafka.Writer
 }
 
-func NewTicketService(kafkaWriter *kafka.Writer) *TicketService {
-	return &TicketService{
+func NewService(kafkaWriter *kafka.Writer) *Service {
+	return &Service{
 		kafkaWriter: kafkaWriter,
 	}
 }
 
-func (t *TicketService) CreateTicket(ticket *model.Ticket) error {
+func (t *Service) CreateTicket(ticket *model.Ticket) error {
 	ticketJSON, err := json.Marshal(ticket)
 	if err != nil {
 		slog.Error("failed to marshal ticket to json", "error", err)
