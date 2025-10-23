@@ -6,6 +6,7 @@ import (
 	"log/slog"
 
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/config"
+	"github.com/iamnotrodger/golang-kafka/services/producer/internal/metrics"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/model"
 	"github.com/segmentio/kafka-go"
 )
@@ -37,6 +38,8 @@ func (t *Service) CreateTicket(ticket *model.Ticket) error {
 	if err != nil {
 		slog.Error("failed to write ticket message to kafka", "error", err)
 	}
+
+	metrics.RecordTicketCreated()
 
 	return err
 }

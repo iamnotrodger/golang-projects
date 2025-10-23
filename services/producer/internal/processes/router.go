@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/api"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/config"
+	"github.com/iamnotrodger/golang-kafka/services/producer/internal/metrics"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
@@ -19,6 +20,7 @@ type Router struct {
 
 func NewRouter(appCtx *AppContext) *Router {
 	engine := gin.New()
+	metrics.MustRegister()
 
 	// g.Use(gin.LoggerWithFormatter(logFormatter), gin.Recovery(), gerror.Handler(), location.Default())
 	engine.NoRoute(api.NotFound())
