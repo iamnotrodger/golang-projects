@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/api"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/config"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type Router struct {
@@ -26,6 +27,7 @@ func NewRouter(appCtx *AppContext) *Router {
 	ticketHandler := &api.TicketAPI{Service: appCtx.ticketService}
 
 	engine.Match([]string{"GET", "HEAD"}, "/health", healthHandler.Health)
+	engine.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	ticket := engine.Group("/ticket")
 	{
