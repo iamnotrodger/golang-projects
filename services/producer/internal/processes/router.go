@@ -23,7 +23,7 @@ func NewRouter(appCtx *AppContext) *Router {
 	engine.NoRoute(api.NotFound())
 
 	healthHandler := &api.HealthAPI{}
-	ticketHandler := &api.TicketAPI{}
+	ticketHandler := &api.TicketAPI{Service: appCtx.ticketService}
 
 	engine.Match([]string{"GET", "HEAD"}, "/health", healthHandler.Health)
 

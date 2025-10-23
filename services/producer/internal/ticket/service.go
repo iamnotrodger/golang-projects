@@ -1,6 +1,10 @@
 package ticket
 
 import (
+	"context"
+	"encoding/json"
+	"log/slog"
+
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/model"
 	"github.com/segmentio/kafka-go"
 )
@@ -16,9 +20,21 @@ func NewTicketService(kafkaWriter *kafka.Writer) *TicketService {
 }
 
 func (t *TicketService) CreateTicket(ticket *model.Ticket) error {
-	// msg := kafka.Message{
-	// 	Key: []byte(ticket.ID),
-	// 	Value: []byte(),
-	// }
-	return nil
+	ticketJSON, err := json.Marshal(ticket)
+	if err != nil {
+		slog.Error("failed to marshal ticket to json", "error", err)
+		return err
+	}
+
+	msg := kafka.Message{
+		Key:   []byte(ticket.ID),
+		Value: []byte(ticketJSON),
+	}
+
+	err = t.kafkaWriter.WriteMessages(context.Background(), msg)
+	if err != nil {
+		slog.Error("failed to write ticket message to kafka", "error", err)
+	}
+
+	return err
 }

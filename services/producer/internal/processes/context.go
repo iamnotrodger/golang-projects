@@ -5,11 +5,13 @@ import (
 
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/app"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/config"
+	"github.com/iamnotrodger/golang-kafka/services/producer/internal/ticket"
 	"github.com/segmentio/kafka-go"
 )
 
 type AppContext struct {
-	kafkaWriter *kafka.Writer
+	kafkaWriter   *kafka.Writer
+	ticketService *ticket.TicketService
 }
 
 func BuildAppProcesses(appCtx *AppContext) map[string]app.Runnable {
@@ -21,6 +23,9 @@ func BuildAppProcesses(appCtx *AppContext) map[string]app.Runnable {
 func NewAppContext(ctx context.Context) *AppContext {
 	appCtx := AppContext{}
 	appCtx.initKafkaWriter()
+
+	appCtx.ticketService = ticket.NewTicketService(appCtx.kafkaWriter)
+
 	return &appCtx
 }
 
