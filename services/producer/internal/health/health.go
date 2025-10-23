@@ -7,12 +7,12 @@ type HealthCheck interface {
 }
 
 type Service struct {
-	Checks map[string]HealthCheck
+	checks map[string]HealthCheck
 }
 
 func NewService() *Service {
 	return &Service{
-		Checks: map[string]HealthCheck{
+		checks: map[string]HealthCheck{
 			"kafka": NewKafkaCheck(),
 		},
 	}
@@ -20,7 +20,7 @@ func NewService() *Service {
 
 // TODO: make this async/concurrent
 func (s *Service) Ping() error {
-	for name, check := range s.Checks {
+	for name, check := range s.checks {
 		if err := check.Ping(); err != nil {
 			slog.Error("health check failed", "service", name, "error", err)
 			return err
