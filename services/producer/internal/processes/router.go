@@ -2,11 +2,14 @@ package processes
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/api"
+	"github.com/iamnotrodger/golang-kafka/services/producer/internal/config"
 )
 
 type Router struct {
@@ -29,7 +32,14 @@ func NewRouter(appContext *ApplicationContext) *Router {
 		ticket.POST("/", ticketHandler.CreateTicket)
 	}
 
-	return &Router{server: &http.Server{Addr: "localhost:8080", Handler: engine}}
+	server := &http.Server{
+		Addr:         fmt.Sprintf("0.0.0.0:%v", config.Global.Port),
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+		Handler:      engine,
+	}
+
+	return &Router{server}
 }
 
 func (r *Router) Run(ctx context.Context, errChan chan error) {
