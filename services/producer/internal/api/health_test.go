@@ -16,7 +16,7 @@ type MockHealthService struct {
 	PingFunc func() error
 }
 
-func (m *MockHealthService) PingKafka() error {
+func (m *MockHealthService) Ping() error {
 	if m.PingFunc != nil {
 		return m.PingFunc()
 	}

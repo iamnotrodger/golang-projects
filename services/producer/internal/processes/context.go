@@ -27,7 +27,7 @@ func NewAppContext(ctx context.Context) *AppContext {
 	appCtx.initKafkaWriter()
 
 	appCtx.ticketService = ticket.NewService(appCtx.kafkaWriter)
-	appCtx.healthService = health.NewService(appCtx.kafkaWriter)
+	appCtx.healthService = health.NewService()
 
 	return &appCtx
 }

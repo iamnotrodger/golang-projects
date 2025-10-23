@@ -5,7 +5,7 @@ import (
 )
 
 type HealthService interface {
-	PingKafka() error
+	Ping() error
 }
 
 type HealthAPI struct {
@@ -13,7 +13,7 @@ type HealthAPI struct {
 }
 
 func (h *HealthAPI) Health(ctx *gin.Context) {
-	if err := h.Service.PingKafka(); err != nil {
+	if err := h.Service.Ping(); err != nil {
 		ctx.JSON(500, gin.H{"status": "unhealthy"})
 		return
 	}
