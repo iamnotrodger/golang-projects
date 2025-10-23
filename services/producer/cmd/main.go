@@ -17,8 +17,6 @@ func main() {
 }
 
 func run() int {
-	config.LoadConfig()
-
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		Level: getLogLevel(),
 		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
