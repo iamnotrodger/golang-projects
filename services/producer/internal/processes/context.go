@@ -6,15 +6,15 @@ import (
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/app"
 )
 
-type ApplicationContext struct {
+type AppContext struct {
 }
 
-func NewApplicationContext(ctx context.Context) *ApplicationContext {
-	return &ApplicationContext{}
+func NewAppContext(ctx context.Context) *AppContext {
+	return &AppContext{}
 }
 
-func BuildApplicationProcesses(ctx *ApplicationContext) map[string]app.Runnable {
+func BuildAppProcesses(appCtx *AppContext) map[string]app.Runnable {
 	return map[string]app.Runnable{
-		"API": NewRouter(ctx),
+		"API": NewRouter(appCtx),
 	}
 }

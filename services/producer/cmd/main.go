@@ -31,8 +31,8 @@ func run() int {
 	ctx, cancel := context.WithCancel(context.Background())
 	shutdownChan := make(chan struct{})
 
-	appCtx := processes.NewApplicationContext(ctx)
-	application := app.NewApplication(processes.BuildApplicationProcesses(appCtx))
+	appCtx := processes.NewAppContext(ctx)
+	application := app.NewApplication(processes.BuildAppProcesses(appCtx))
 	errChan := application.Run(ctx, shutdownChan)
 
 	exitCode := waitForTermination(cancel, shutdownChan, errChan)

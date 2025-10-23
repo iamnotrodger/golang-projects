@@ -16,7 +16,7 @@ type Router struct {
 	server *http.Server
 }
 
-func NewRouter(appContext *ApplicationContext) *Router {
+func NewRouter(appCtx *AppContext) *Router {
 	engine := gin.New()
 
 	// g.Use(gin.LoggerWithFormatter(logFormatter), gin.Recovery(), gerror.Handler(), location.Default())
