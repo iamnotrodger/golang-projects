@@ -17,5 +17,5 @@ func TestNotFound(t *testing.T) {
 	NotFound()(ctx)
 
 	assert.Equal(t, 404, w.Code)
-	assert.JSONEq(t, `{"errorCode":404, "errorDescription":"route not found", "error":"Not Found"}`, w.Body.String())
+	assert.JSONEq(t, `{"code":404, "description":"route not found", "error":"Not Found"}`, w.Body.String())
 }

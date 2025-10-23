@@ -10,9 +10,9 @@ import (
 func NotFound() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, &model.Error{
-			Error:            http.StatusText(http.StatusNotFound),
-			ErrorCode:        http.StatusNotFound,
-			ErrorDescription: "route not found",
+			Error:       http.StatusText(http.StatusNotFound),
+			Code:        http.StatusNotFound,
+			Description: "route not found",
 		})
 	}
 }
