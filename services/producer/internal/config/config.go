@@ -8,24 +8,30 @@ import (
 )
 
 const (
-	defaultPort     = 8080
-	defaultLogLevel = "info"
+	defaultPort             = 8080
+	defaultLogLevel         = "info"
+	defaultKafkaBroker      = "localhost:9092"
+	defaultKafkaTicketTopic = "tickets"
 )
 
 type Secret struct{}
 
 type Spec struct {
-	*Secret  `json:"-"`
-	Port     int    `mapstructure:"port"`
-	LogLevel string `mapstructure:"log_level"`
+	*Secret          `json:"-"`
+	Port             int    `mapstructure:"port"`
+	LogLevel         string `mapstructure:"log_level"`
+	KafkaBroker      string `mapstructure:"kafka_broker"`
+	KafkaTicketTopic string `mapstructure:"kafka_topic"`
 }
 
 func New() *Spec {
 	secret := &Secret{}
 	return &Spec{
-		Secret:   secret,
-		Port:     defaultPort,
-		LogLevel: defaultLogLevel,
+		Secret:           secret,
+		Port:             defaultPort,
+		LogLevel:         defaultLogLevel,
+		KafkaBroker:      defaultKafkaBroker,
+		KafkaTicketTopic: defaultKafkaTicketTopic,
 	}
 }
 

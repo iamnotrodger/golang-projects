@@ -10,6 +10,8 @@ import (
 func TestGlobal(t *testing.T) {
 	assert.Equal(t, Global.Port, defaultPort)
 	assert.Equal(t, Global.LogLevel, defaultLogLevel)
+	assert.Equal(t, Global.KafkaBroker, defaultKafkaBroker)
+	assert.Equal(t, Global.KafkaTicketTopic, defaultKafkaTicketTopic)
 }
 
 func TestLoadConfig(t *testing.T) {
