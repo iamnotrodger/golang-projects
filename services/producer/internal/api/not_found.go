@@ -12,7 +12,7 @@ func NotFound() gin.HandlerFunc {
 		c.JSON(http.StatusNotFound, &model.Error{
 			Error:            http.StatusText(http.StatusNotFound),
 			ErrorCode:        http.StatusNotFound,
-			ErrorDescription: "page not found",
+			ErrorDescription: "route not found",
 		})
 	}
 }
