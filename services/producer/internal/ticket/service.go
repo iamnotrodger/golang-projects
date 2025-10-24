@@ -39,7 +39,7 @@ func (t *Service) CreateTicket(ticket *model.Ticket) error {
 		slog.Error("failed to write ticket message to kafka", "error", err)
 	}
 
-	metrics.RecordTicketCreated()
+	metrics.RecordTicketCreated("ticket_type")
 
 	return err
 }

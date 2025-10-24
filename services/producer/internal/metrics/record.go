@@ -1,5 +1,9 @@
 package metrics
 
-func RecordTicketCreated() {
-	metric.TicketsCreatedCounter.WithLabelValues().Inc()
+func RecordTicketCreated(ticketType string) {
+	metric.TicketsCreatedCounter.WithLabelValues(ticketType).Inc()
+}
+
+func RecordError(errorType string) {
+	metric.ErrorCounter.WithLabelValues(errorType).Inc()
 }

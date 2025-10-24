@@ -11,4 +11,5 @@ func TestMustRegister(t *testing.T) {
 	MustRegister()
 
 	assert.True(t, prometheus.Unregister(metric.TicketsCreatedCounter))
+	assert.True(t, prometheus.Unregister(metric.ErrorCounter))
 }
