@@ -8,7 +8,7 @@ import (
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/config"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/model"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/writer"
-	"github.com/segmentio/kafka-go"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -46,15 +46,12 @@ func TestCreateTicket(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockWriter := &writer.MockKafkaWriter{
-				Messages:      []kafka.Message{},
-				WriteErr:      tt.expectedError,
-				ShouldCapture: tt.expectedError == nil,
-			}
-
+			mockWriter := &writer.MockKafkaWriter{}
 			service := &Service{
 				kafkaWriter: mockWriter,
 			}
+
+			mockWriter.On("WriteMessages", mock.Anything, mock.Anything).Return(tt.expectedError)
 
 			err := service.CreateTicket(tt.ticket)
 			require.Equal(t, tt.expectedError, err)

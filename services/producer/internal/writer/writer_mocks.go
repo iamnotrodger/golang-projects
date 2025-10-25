@@ -4,24 +4,19 @@ import (
 	"context"
 
 	"github.com/segmentio/kafka-go"
+	"github.com/stretchr/testify/mock"
 )
 
 type MockKafkaWriter struct {
-	Messages      []kafka.Message
-	WriteErr      error
-	ShouldCapture bool
+	mock.Mock
 }
 
 func (m *MockKafkaWriter) WriteMessages(ctx context.Context, msgs ...kafka.Message) error {
-	if m.WriteErr != nil {
-		return m.WriteErr
-	}
-	if m.ShouldCapture {
-		m.Messages = append(m.Messages, msgs...)
-	}
-	return nil
+	args := m.Called(ctx, msgs)
+	return args.Error(0)
 }
 
 func (m *MockKafkaWriter) Close() error {
-	return nil
+	args := m.Called()
+	return args.Error(0)
 }
