@@ -35,6 +35,15 @@ func (c *Consumer) start(errChan chan error) {
 			return
 		}
 
+		slog.Info(
+			"received message",
+			"topic", message.Topic,
+			"partition", message.Partition,
+			"offset", message.Offset,
+			"key", string(message.Key),
+			"value_length", len(message.Value),
+		)
+
 		if err := c.handler(ctx, message); err != nil {
 			slog.Error("failed to handle kafka message", "error", err.Error(), "topic", message.Topic)
 			continue
