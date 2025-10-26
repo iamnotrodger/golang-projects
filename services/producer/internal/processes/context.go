@@ -12,9 +12,9 @@ import (
 )
 
 type AppContext struct {
-	kafkaWriter   *kafka.Writer
-	ticketService *ticket.Service
-	healthService *health.Service
+	kafkaWriterConfig *kafka.WriterConfig
+	ticketService     *ticket.Service
+	healthService     *health.Service
 }
 
 func BuildAppProcesses(appCtx *AppContext) map[string]app.Runnable {
@@ -27,17 +27,17 @@ func NewAppContext(ctx context.Context) *AppContext {
 	appCtx := AppContext{}
 	appCtx.initKafkaWriter()
 
-	appCtx.ticketService = ticket.NewService(appCtx.kafkaWriter)
+	appCtx.ticketService = ticket.NewService(appCtx.kafkaWriterConfig)
 	appCtx.healthService = health.NewService()
 
 	return &appCtx
 }
 
 func (a *AppContext) initKafkaWriter() {
-	a.kafkaWriter = &kafka.Writer{
-		Addr:                   kafka.TCP(config.Global.KafkaBroker),
-		Balancer:               &kafka.LeastBytes{},
-		AllowAutoTopicCreation: true,
+	a.kafkaWriterConfig = &kafka.WriterConfig{
+		Addr:     kafka.TCP(config.Global.KafkaBroker),
+		Topic:    config.Global.KafkaTicketTopic,
+		Balancer: &kafka.LeastBytes{},
 	}
 
 	if config.Global.Env == "development" {

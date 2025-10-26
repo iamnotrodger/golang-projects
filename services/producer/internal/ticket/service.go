@@ -18,7 +18,13 @@ type Service struct {
 	kafkaWriter writer.KafkaWriter
 }
 
-func NewService(kafkaWriter *kafka.Writer) *Service {
+func NewService() *Service {
+	kafkaWriter := &kafka.Writer{
+		Addr:     kafka.TCP(config.Global.KafkaBroker),
+		Topic:    config.Global.KafkaTicketTopic,
+		Balancer: &kafka.LeastBytes{},
+	}
+
 	return &Service{
 		kafkaWriter: writer.NewKafkaWriterAdapter(kafkaWriter),
 	}
@@ -34,7 +40,7 @@ func (t *Service) CreateTicket(ticket *model.Ticket) error {
 
 	ticketBytes, err := proto.Marshal(protoTicket)
 	if err != nil {
-		slog.Error("failed to marshal ticket to protobuf", "error", err)
+		slog.Error("failed to marshal ticket to protobuf", "error", err.Error())
 		return err
 	}
 
@@ -46,7 +52,7 @@ func (t *Service) CreateTicket(ticket *model.Ticket) error {
 
 	err = t.kafkaWriter.WriteMessages(context.Background(), msg)
 	if err != nil {
-		slog.Error("failed to write ticket message to kafka", "error", err)
+		slog.Error("failed to write ticket message to kafka", "error", err.Error())
 		return err
 	}
 
