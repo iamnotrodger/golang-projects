@@ -12,9 +12,8 @@ import (
 )
 
 type AppContext struct {
-	kafkaWriterConfig *kafka.WriterConfig
-	ticketService     *ticket.Service
-	healthService     *health.Service
+	ticketService *ticket.Service
+	healthService *health.Service
 }
 
 func BuildAppProcesses(appCtx *AppContext) map[string]app.Runnable {
@@ -27,23 +26,17 @@ func NewAppContext(ctx context.Context) *AppContext {
 	appCtx := AppContext{}
 	appCtx.initKafkaWriter()
 
-	appCtx.ticketService = ticket.NewService(appCtx.kafkaWriterConfig)
+	appCtx.ticketService = ticket.NewService()
 	appCtx.healthService = health.NewService()
 
 	return &appCtx
 }
 
 func (a *AppContext) initKafkaWriter() {
-	a.kafkaWriterConfig = &kafka.WriterConfig{
-		Addr:     kafka.TCP(config.Global.KafkaBroker),
-		Topic:    config.Global.KafkaTicketTopic,
-		Balancer: &kafka.LeastBytes{},
-	}
-
 	if config.Global.Env == "development" {
 		conn, err := kafka.DialLeader(context.Background(), "tcp", config.Global.KafkaBroker, config.Global.KafkaTicketTopic, 0)
 		if err != nil {
-			slog.Error("failed to dial kafka leader and create topic", "error", err)
+			slog.Error("failed to dial kafka leader and create topic", "error", err.Error())
 		}
 		defer conn.Close()
 	}

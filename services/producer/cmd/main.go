@@ -51,7 +51,7 @@ func waitForTermination(cancel context.CancelFunc, shutdownChan chan struct{}, e
 			exitCode = 1
 		}
 		if err != nil {
-			slog.Error("application error", "error", err)
+			slog.Error("application error", "error", err.Error())
 			exitCode = 1
 		}
 	case sig := <-sigs:

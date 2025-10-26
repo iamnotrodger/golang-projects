@@ -22,7 +22,7 @@ func NewService() *Service {
 func (s *Service) Ping() error {
 	for name, check := range s.checks {
 		if err := check.Ping(); err != nil {
-			slog.Error("health check failed", "service", name, "error", err)
+			slog.Error("health check failed", "service", name, "error", err.Error())
 			return err
 		}
 	}

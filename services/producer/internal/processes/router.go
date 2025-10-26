@@ -60,7 +60,7 @@ func (r *Router) stop(ctx context.Context) {
 
 	shutdownCtx := context.Background()
 	if err := r.server.Shutdown(shutdownCtx); err != nil {
-		slog.Error("api server shutdown failed", "error", err)
+		slog.Error("api server shutdown failed", "error", err.Error())
 	} else {
 		slog.Info("api server shutdown")
 	}
