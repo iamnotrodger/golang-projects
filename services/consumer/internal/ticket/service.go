@@ -19,9 +19,11 @@ func (t *Service) HandleMessage(ctx context.Context, msg kafka.Message) error {
 	var ticket topics.Ticket
 
 	if err := proto.Unmarshal(msg.Value, &ticket); err != nil {
-		slog.Error("failed to unmarshal ticket from protobuf",
+		slog.Error(
+			"failed to unmarshal ticket from protobuf",
 			"error", err.Error(),
-			"raw_value", string(msg.Value))
+			"raw_value", string(msg.Value),
+		)
 		return err
 	}
 
