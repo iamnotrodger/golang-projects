@@ -33,11 +33,9 @@ func NewAppContext(ctx context.Context) *AppContext {
 }
 
 func (a *AppContext) initKafkaWriter() {
-	if config.Global.Env == "development" {
-		conn, err := kafka.DialLeader(context.Background(), "tcp", config.Global.KafkaBroker, config.Global.KafkaTicketTopic, 0)
-		if err != nil {
-			slog.Error("failed to dial kafka leader and create topic", "error", err.Error())
-		}
-		defer conn.Close()
+	conn, err := kafka.DialLeader(context.Background(), "tcp", config.Global.KafkaBroker, config.Global.KafkaTicketTopic, 0)
+	if err != nil {
+		slog.Error("failed to dial kafka leader and create topic", "error", err.Error())
 	}
+	defer conn.Close()
 }

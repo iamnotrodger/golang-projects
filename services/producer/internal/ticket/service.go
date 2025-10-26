@@ -20,8 +20,8 @@ type Service struct {
 
 func NewService() *Service {
 	kafkaWriter := &kafka.Writer{
-		Addr:     kafka.TCP(config.Global.KafkaBroker),
 		Topic:    config.Global.KafkaTicketTopic,
+		Addr:     kafka.TCP(config.Global.KafkaBroker),
 		Balancer: &kafka.LeastBytes{},
 	}
 
@@ -34,7 +34,7 @@ func (t *Service) CreateTicket(ticket *model.Ticket) error {
 	protoTicket := &topics.Ticket{
 		Id:        ticket.ID,
 		Title:     ticket.Title,
-		Price:     float32(ticket.Price),
+		Price:     ticket.Price,
 		CreatedAt: timestamppb.New(ticket.CreatedAt),
 	}
 
@@ -45,7 +45,6 @@ func (t *Service) CreateTicket(ticket *model.Ticket) error {
 	}
 
 	msg := kafka.Message{
-		Topic: config.Global.KafkaTicketTopic,
 		Key:   []byte(ticket.ID),
 		Value: ticketBytes,
 	}
