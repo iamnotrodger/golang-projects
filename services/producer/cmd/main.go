@@ -7,7 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/iamnotrodger/golang-kafka/services/producer/internal/app"
+	"github.com/iamnotrodger/golang-kafka/pkg/app"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/config"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/processes"
 )

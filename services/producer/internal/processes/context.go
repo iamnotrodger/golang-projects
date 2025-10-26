@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/iamnotrodger/golang-kafka/services/producer/internal/app"
+	"github.com/iamnotrodger/golang-kafka/pkg/app"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/config"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/health"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/ticket"
