@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/iamnotrodger/golang-kafka/pkg/app"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/config"
@@ -35,17 +37,32 @@ func run() int {
 	application := app.NewApplication(processes.BuildAppProcesses(appCtx))
 	errChan := application.Run(ctx, shutdownChan)
 
-	exitCode := waitForTermination(cancel, shutdownChan, errChan)
+	exitCode := waitForTermination(terminationContext{
+		Context:      ctx,
+		cancel:       cancel,
+		shutdownChan: shutdownChan,
+		errChan:      errChan,
+		appCtx:       appCtx,
+	})
+
 	return exitCode
 }
 
-func waitForTermination(cancel context.CancelFunc, shutdownChan chan struct{}, errChan <-chan error) int {
+type terminationContext struct {
+	context.Context
+	cancel       context.CancelFunc
+	shutdownChan chan struct{}
+	errChan      <-chan error
+	appCtx       *processes.AppContext
+}
+
+func waitForTermination(terminationCtx terminationContext) int {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	exitCode := 0
 
 	select {
-	case err, ok := <-errChan:
+	case err, ok := <-terminationCtx.errChan:
 		if !ok {
 			slog.Error("error channel closed unexpectedly")
 			exitCode = 1
@@ -58,10 +75,32 @@ func waitForTermination(cancel context.CancelFunc, shutdownChan chan struct{}, e
 		slog.Info("received signal, shutting down", "signal", sig)
 	}
 
-	cancel()
-	<-shutdownChan
+	terminationCtx.cancel()
+	if err := waitForShutdown(terminationCtx); err != nil {
+		exitCode = 1
+	}
 
 	return exitCode
+}
+
+func waitForShutdown(terminationCtx terminationContext) error {
+	slog.Info("waiting for shutdown to complete")
+
+	timer := time.NewTimer(30 * time.Second)
+	var err error
+
+	select {
+	case <-terminationCtx.shutdownChan:
+		slog.Info("application shutdown successful")
+	case <-timer.C:
+		errMsg := "ungraceful shutdown timeout reached"
+		slog.Warn(errMsg)
+		err = errors.New(errMsg)
+
+	}
+
+	timer.Stop()
+	return err
 }
 
 func getLogLevel() slog.Level {

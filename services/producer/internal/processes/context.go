@@ -24,7 +24,7 @@ func BuildAppProcesses(appCtx *AppContext) map[string]app.Runnable {
 
 func NewAppContext(ctx context.Context) *AppContext {
 	appCtx := AppContext{}
-	appCtx.initKafkaWriter()
+	// appCtx.initKafkaWriter()
 
 	appCtx.ticketService = ticket.NewService()
 	appCtx.healthService = health.NewService()

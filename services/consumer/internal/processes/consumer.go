@@ -22,15 +22,17 @@ func NewConsumer(config *kafka.ReaderConfig, handler KafkaMessageHandler) *Consu
 }
 
 func (c *Consumer) Run(ctx context.Context, errChan chan error) {
-	go c.start(errChan)
+	go c.start(ctx, errChan)
 	c.stop(ctx)
 }
 
-func (c *Consumer) start(errChan chan error) {
+func (c *Consumer) start(ctx context.Context, errChan chan error) {
 	for {
-		ctx := context.Background()
 		message, err := c.reader.FetchMessage(ctx)
 		if err != nil {
+			if ctx.Err() != nil {
+				return
+			}
 			errChan <- err
 			return
 		}

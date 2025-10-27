@@ -24,15 +24,8 @@ func NewApplication(processes map[string]Runnable) *Application {
 func (app *Application) Run(ctx context.Context, shutdownChan chan struct{}) chan error {
 	slog.Info("starting application")
 
-	processesCtx, cancelProcesses := context.WithCancel(ctx)
-	errChan := app.startProcesses(processesCtx)
-
-	go app.waitForShutdown(shutdownContext{
-		Context:         ctx,
-		cancelProcesses: cancelProcesses,
-		shutdownChan:    shutdownChan,
-		errChan:         errChan,
-	})
+	errChan := app.startProcesses(ctx)
+	go app.waitForShutdown(ctx, shutdownChan, errChan)
 
 	return errChan
 }
@@ -56,21 +49,14 @@ func (app *Application) startProcesses(ctx context.Context) chan error {
 	return errChan
 }
 
-type shutdownContext struct {
-	context.Context
-	cancelProcesses context.CancelFunc
-	shutdownChan    chan struct{}
-	errChan         chan error
-}
+func (app *Application) waitForShutdown(ctx context.Context, shutdownChan chan struct{}, errChan chan error) {
+	<-ctx.Done()
 
-func (app *Application) waitForShutdown(shutdown shutdownContext) {
-	<-shutdown.Done()
 	slog.Info("application shutdown requested")
-
-	shutdown.cancelProcesses()
 	app.wg.Wait()
-	close(shutdown.errChan)
-	close(shutdown.shutdownChan)
+
+	close(errChan)
+	close(shutdownChan)
 
 	slog.Info("all processes stopped, application shutting down")
 }

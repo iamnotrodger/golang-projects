@@ -37,3 +37,7 @@ func NewAppContext(ctx context.Context) *AppContext {
 
 	return &appCtx
 }
+
+func (a *AppContext) Shutdown(ctx context.Context) error {
+	return nil
+}
