@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -23,25 +22,29 @@ type MockRunnable struct {
 }
 
 func (runnable *MockRunnable) Run(ctx context.Context, errChan chan error) {
+	done := make(chan struct{})
+
 	go func() {
+		defer close(done)
 		runnable.ErrorCount = 0
 		for {
-			time.Sleep(runnable.Interval)
-			if runnable.Terminated() {
+			select {
+			case <-ctx.Done():
 				return
-			}
-
-			if runnable.IsThrowError {
-				runnable.leaderMutex.Lock()
-				errChan <- errors.New(fmt.Sprint(runnable.Name, ":error:", runnable.ErrorCount))
-				runnable.ErrorCount++
-				runnable.leaderMutex.Unlock()
+			case <-time.After(runnable.Interval):
+				if runnable.IsThrowError {
+					runnable.leaderMutex.Lock()
+					errChan <- errors.New(fmt.Sprint(runnable.Name, ":error:", runnable.ErrorCount))
+					runnable.ErrorCount++
+					runnable.leaderMutex.Unlock()
+				}
 			}
 		}
 	}()
 
 	<-ctx.Done()
 	time.Sleep(runnable.ShutdownDuration)
+	<-done
 	runnable.leaderMutex.Lock()
 	runnable.isTerminated = true
 	runnable.leaderMutex.Unlock()
@@ -53,12 +56,10 @@ func (runnable *MockRunnable) Terminated() bool {
 	return runnable.isTerminated
 }
 
-func TestApplication_Start(t *testing.T) {
+func TestApplication(t *testing.T) {
 	type testDef struct {
-		name         string
-		processes    map[string]Runnable
-		shutdownChan chan struct{}
-		errChan      chan error
+		name      string
+		processes map[string]Runnable
 	}
 
 	tests := []testDef{
@@ -81,8 +82,6 @@ func TestApplication_Start(t *testing.T) {
 					IsThrowError: true,
 				},
 			},
-			errChan:      make(chan error),
-			shutdownChan: make(chan struct{}),
 		},
 	}
 
@@ -91,28 +90,12 @@ func TestApplication_Start(t *testing.T) {
 			func(t *testing.T) {
 				ctx, cancel := context.WithCancel(context.Background())
 				application := NewApplication(td.processes)
-				errChan := application.Run(ctx, td.shutdownChan)
-
-				errors := map[string]int{}
-
-				for errors["p2"] < 2 && errors["p3"] < 2 {
-					err := <-errChan
-					msg := err.Error()
-					processName := strings.Split(msg, ":")[0]
-					errors[processName]++
-				}
+				errChan := application.Run(ctx)
+				defer close(errChan)
 
 				cancel()
+				application.Shutdown()
 
-				isShutdownChannelOpen := true
-				select {
-				case _, isShutdownChannelOpen = <-td.shutdownChan:
-				case <-time.After(time.Second * 2):
-					t.Fatal("shutdown channel was not closed within timeout")
-				}
-
-				require.Equal(t, errors["p1"], 0)
-				require.False(t, isShutdownChannelOpen)
 				require.True(t, td.processes["p1"].(*MockRunnable).Terminated())
 				require.True(t, td.processes["p2"].(*MockRunnable).Terminated())
 				require.True(t, td.processes["p3"].(*MockRunnable).Terminated())

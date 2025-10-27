@@ -21,16 +21,8 @@ func NewApplication(processes map[string]Runnable) *Application {
 	}
 }
 
-func (app *Application) Run(ctx context.Context, shutdownChan chan struct{}) chan error {
+func (app *Application) Run(ctx context.Context) chan error {
 	slog.Info("starting application")
-
-	errChan := app.startProcesses(ctx)
-	go app.waitForShutdown(ctx, shutdownChan, errChan)
-
-	return errChan
-}
-
-func (app *Application) startProcesses(ctx context.Context) chan error {
 	errChan := make(chan error)
 
 	for name, process := range app.processes {
@@ -49,14 +41,8 @@ func (app *Application) startProcesses(ctx context.Context) chan error {
 	return errChan
 }
 
-func (app *Application) waitForShutdown(ctx context.Context, shutdownChan chan struct{}, errChan chan error) {
-	<-ctx.Done()
-
+func (app *Application) Shutdown() {
 	slog.Info("application shutdown requested")
 	app.wg.Wait()
-
-	close(errChan)
-	close(shutdownChan)
-
 	slog.Info("all processes stopped, application shutting down")
 }

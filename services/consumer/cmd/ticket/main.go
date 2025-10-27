@@ -31,28 +31,29 @@ func run() int {
 	slog.SetDefault(logger)
 
 	ctx, cancel := context.WithCancel(context.Background())
-	shutdownChan := make(chan struct{})
-
 	appCtx := appctx.NewAppContext(ctx)
 	application := app.NewApplication(appctx.BuildAppProcesses(appCtx))
-	errChan := application.Run(ctx, shutdownChan)
+	errChan := application.Run(ctx)
+	defer close(errChan)
 
 	exitCode := waitForTermination(terminationContext{
-		Context:      ctx,
-		cancel:       cancel,
-		shutdownChan: shutdownChan,
-		errChan:      errChan,
-		appCtx:       appCtx,
+		Context: ctx,
+		cancel:  cancel,
+		shutdown: func() {
+			appCtx.Shutdown(context.Background())
+			application.Shutdown()
+		},
+		errChan: errChan,
 	})
+
 	return exitCode
 }
 
 type terminationContext struct {
 	context.Context
-	cancel       context.CancelFunc
-	shutdownChan chan struct{}
-	errChan      <-chan error
-	appCtx       *appctx.AppContext
+	cancel   context.CancelFunc
+	shutdown func()
+	errChan  <-chan error
 }
 
 func waitForTermination(terminationCtx terminationContext) int {
@@ -90,8 +91,7 @@ func waitForShutdown(terminationCtx terminationContext) error {
 
 	done := make(chan struct{})
 	go func() {
-		<-terminationCtx.shutdownChan
-		terminationCtx.appCtx.Shutdown(terminationCtx)
+		terminationCtx.shutdown()
 		close(done)
 	}()
 
