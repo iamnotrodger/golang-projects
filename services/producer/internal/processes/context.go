@@ -24,7 +24,7 @@ func BuildAppProcesses(appCtx *AppContext) map[string]app.Runnable {
 
 func NewAppContext(ctx context.Context) *AppContext {
 	appCtx := AppContext{}
-	// appCtx.initKafkaWriter()
+	appCtx.initKafkaWriter()
 
 	appCtx.ticketService = ticket.NewService()
 	appCtx.healthService = health.NewService()
@@ -38,4 +38,8 @@ func (a *AppContext) initKafkaWriter() {
 		slog.Error("failed to dial kafka leader and create topic", "error", err.Error())
 	}
 	defer conn.Close()
+}
+
+func (a *AppContext) Shutdown(ctx context.Context) error {
+	return nil
 }

@@ -88,8 +88,15 @@ func waitForShutdown(terminationCtx terminationContext) error {
 	timer := time.NewTimer(30 * time.Second)
 	var err error
 
+	done := make(chan struct{})
+	go func() {
+		<-terminationCtx.shutdownChan
+		terminationCtx.appCtx.Shutdown(terminationCtx)
+		close(done)
+	}()
+
 	select {
-	case <-terminationCtx.shutdownChan:
+	case <-done:
 		slog.Info("application shutdown successful")
 	case <-timer.C:
 		errMsg := "ungraceful shutdown timeout reached"
