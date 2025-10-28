@@ -30,9 +30,6 @@ func (c *Consumer) start(ctx context.Context, errChan chan error) {
 	for {
 		message, err := c.reader.FetchMessage(ctx)
 		if err != nil {
-			if ctx.Err() != nil {
-				return
-			}
 			errChan <- err
 			return
 		}
