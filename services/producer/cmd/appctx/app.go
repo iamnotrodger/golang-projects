@@ -16,7 +16,7 @@ type AppContext struct {
 
 func BuildAppProcesses(appCtx *AppContext) map[string]app.Runnable {
 	return map[string]app.Runnable{
-		"API": processes.NewRouter(processes.RouterServices{
+		"http": processes.NewHttpServer(processes.HttpServerServices{
 			HealthService: appCtx.healthService,
 			TicketService: appCtx.ticketService,
 		}),

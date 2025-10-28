@@ -16,16 +16,16 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-type Router struct {
+type HttpServer struct {
 	server *http.Server
 }
 
-type RouterServices struct {
+type HttpServerServices struct {
 	HealthService *health.Service
 	TicketService *ticket.Service
 }
 
-func NewRouter(services RouterServices) *Router {
+func NewHttpServer(services HttpServerServices) *HttpServer {
 	engine := gin.New()
 	metrics.MustRegister()
 
@@ -50,23 +50,23 @@ func NewRouter(services RouterServices) *Router {
 		Handler:      engine,
 	}
 
-	return &Router{server}
+	return &HttpServer{server}
 }
 
-func (r *Router) Run(ctx context.Context, errChan chan error) {
-	go r.start(errChan)
-	r.stop(ctx)
+func (h *HttpServer) Run(ctx context.Context, errChan chan error) {
+	go h.start(errChan)
+	h.stop(ctx)
 }
 
-func (r *Router) start(errChan chan error) {
-	errChan <- r.server.ListenAndServe()
+func (h *HttpServer) start(errChan chan error) {
+	errChan <- h.server.ListenAndServe()
 }
 
-func (r *Router) stop(ctx context.Context) {
+func (h *HttpServer) stop(ctx context.Context) {
 	<-ctx.Done()
 
 	shutdownCtx := context.Background()
-	if err := r.server.Shutdown(shutdownCtx); err != nil {
+	if err := h.server.Shutdown(shutdownCtx); err != nil {
 		slog.Error("api server shutdown failed", "error", err.Error())
 	} else {
 		slog.Info("api server shutdown")
