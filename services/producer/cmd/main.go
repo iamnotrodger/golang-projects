@@ -102,7 +102,6 @@ func waitForShutdown(terminationCtx terminationContext) error {
 		errMsg := "ungraceful shutdown timeout reached"
 		slog.Warn(errMsg)
 		err = errors.New(errMsg)
-
 	}
 
 	timer.Stop()
