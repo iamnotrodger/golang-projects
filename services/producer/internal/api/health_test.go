@@ -8,19 +8,18 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
 // MockHealthDatabase is a mock implementation of HealthDatabase
 type MockHealthService struct {
-	PingFunc func() error
+	mock.Mock
 }
 
 func (m *MockHealthService) Ping() error {
-	if m.PingFunc != nil {
-		return m.PingFunc()
-	}
-	return nil
+	args := m.Called()
+	return args.Error(0)
 }
 
 func TestHealthAPI_Health(t *testing.T) {
@@ -48,11 +47,8 @@ func TestHealthAPI_Health(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockService := &MockHealthService{
-				PingFunc: func() error {
-					return tt.dbPingError
-				},
-			}
+			mockService := &MockHealthService{}
+			mockService.On("Ping", tt.dbPingError).Return(tt.dbPingError)
 
 			healthAPI := NewHealthAPI(mockService)
 
