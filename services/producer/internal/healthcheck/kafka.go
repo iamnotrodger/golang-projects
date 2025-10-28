@@ -1,7 +1,7 @@
-package health
+package healthcheck
 
 import (
-	"github.com/iamnotrodger/golang-kafka/services/consumer/internal/config"
+	"github.com/iamnotrodger/golang-kafka/services/producer/internal/config"
 	"github.com/segmentio/kafka-go"
 )
 

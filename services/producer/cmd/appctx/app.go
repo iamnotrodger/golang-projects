@@ -4,7 +4,9 @@ import (
 	"context"
 
 	"github.com/iamnotrodger/golang-kafka/pkg/app"
-	"github.com/iamnotrodger/golang-kafka/services/producer/internal/health"
+	"github.com/iamnotrodger/golang-kafka/pkg/health"
+	"github.com/iamnotrodger/golang-kafka/services/producer/internal/healthcheck"
+	"github.com/iamnotrodger/golang-kafka/services/producer/internal/metrics"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/processes"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/ticket"
 )
@@ -26,8 +28,12 @@ func BuildAppProcesses(appCtx *AppContext) map[string]app.Runnable {
 func NewAppContext(ctx context.Context) *AppContext {
 	appCtx := AppContext{}
 
+	metrics.MustRegister()
+
 	appCtx.ticketService = ticket.NewService()
-	appCtx.healthService = health.NewService()
+	appCtx.healthService = health.NewService(map[string]health.HealthCheck{
+		"kafka": healthcheck.NewKafkaCheck(),
+	})
 
 	return &appCtx
 }

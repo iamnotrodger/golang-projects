@@ -5,8 +5,10 @@ import (
 	"log/slog"
 
 	"github.com/iamnotrodger/golang-kafka/pkg/app"
+	"github.com/iamnotrodger/golang-kafka/pkg/health"
 	"github.com/iamnotrodger/golang-kafka/services/consumer/internal/config"
-	"github.com/iamnotrodger/golang-kafka/services/consumer/internal/health"
+	"github.com/iamnotrodger/golang-kafka/services/consumer/internal/healthcheck"
+	"github.com/iamnotrodger/golang-kafka/services/consumer/internal/metrics"
 	"github.com/iamnotrodger/golang-kafka/services/consumer/internal/processes"
 	"github.com/iamnotrodger/golang-kafka/services/consumer/internal/ticket"
 	"github.com/jackc/pgx/v5"
@@ -35,11 +37,14 @@ func NewAppContext(ctx context.Context) *AppContext {
 		GroupID: "ticket-consumer-group",
 	}
 
+	metrics.MustRegister()
 	appCtx.initDBClient(ctx)
 
 	ticketStore := ticket.NewStore(appCtx.dbClient)
 
-	appCtx.healthService = health.NewService()
+	appCtx.healthService = health.NewService(map[string]health.HealthCheck{
+		"kafka": healthcheck.NewKafkaCheck(),
+	})
 	appCtx.ticketService = ticket.NewService(ticketStore)
 
 	return &appCtx

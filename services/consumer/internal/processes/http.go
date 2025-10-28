@@ -9,9 +9,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/iamnotrodger/golang-kafka/pkg/health"
-	"github.com/iamnotrodger/golang-kafka/services/producer/internal/api"
-	"github.com/iamnotrodger/golang-kafka/services/producer/internal/config"
-	"github.com/iamnotrodger/golang-kafka/services/producer/internal/ticket"
+	"github.com/iamnotrodger/golang-kafka/services/consumer/internal/api"
+	"github.com/iamnotrodger/golang-kafka/services/consumer/internal/config"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
@@ -21,7 +20,6 @@ type HttpServer struct {
 
 type HttpServerServices struct {
 	HealthService *health.Service
-	TicketService *ticket.Service
 }
 
 func NewHttpServer(services HttpServerServices) *HttpServer {
@@ -31,15 +29,9 @@ func NewHttpServer(services HttpServerServices) *HttpServer {
 	engine.NoRoute(api.NotFound())
 
 	healthHandler := api.NewHealthAPI(services.HealthService)
-	ticketHandler := api.NewTicketAPI(services.TicketService)
 
 	engine.Match([]string{"GET", "HEAD"}, "/health", healthHandler.Health)
 	engine.GET("/metrics", gin.WrapH(promhttp.Handler()))
-
-	ticket := engine.Group("/ticket")
-	{
-		ticket.POST("/", ticketHandler.CreateTicket)
-	}
 
 	server := &http.Server{
 		Addr:         fmt.Sprintf("0.0.0.0:%v", config.Global.Port),
