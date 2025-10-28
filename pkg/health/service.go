@@ -40,11 +40,14 @@ func (s *Service) Ping(ctx context.Context) error {
 	}
 
 	for range len(s.checks) {
-		res := <-results
-		if res.err != nil {
-			slog.Error("health check failed", "service", res.name, "error", res.err.Error())
-			cancel()
-			return res.err
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case res := <-results:
+			if res.err != nil {
+				slog.Error("health check failed", "service", res.name, "error", res.err.Error())
+				return res.err
+			}
 		}
 	}
 
