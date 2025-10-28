@@ -9,10 +9,18 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-type Service struct{}
+type ticketStore interface {
+	CreateTicket(ctx context.Context, ticket *topics.Ticket) error
+}
 
-func NewService() *Service {
-	return &Service{}
+type Service struct {
+	store ticketStore
+}
+
+func NewService(store ticketStore) *Service {
+	return &Service{
+		store: store,
+	}
 }
 
 func (t *Service) HandleMessage(ctx context.Context, msg kafka.Message) error {
@@ -27,12 +35,12 @@ func (t *Service) HandleMessage(ctx context.Context, msg kafka.Message) error {
 		return err
 	}
 
-	slog.Info(
-		"successfully parsed ticket",
-		"id", ticket.Id,
-		"title", ticket.Title,
-		"price", ticket.Price,
-	)
+	slog.Info("creating ticket", "id", ticket.Id)
+
+	if err := t.store.CreateTicket(ctx, &ticket); err != nil {
+		slog.Error("failed to create ticket", "error", err.Error())
+		return err
+	}
 
 	return nil
 }
