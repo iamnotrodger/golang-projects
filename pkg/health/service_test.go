@@ -53,7 +53,7 @@ func TestService_Ping(t *testing.T) {
 				check1.On("Ping").Return(nil)
 
 				check2 := &MockHealthCheck{}
-				check2.On("Ping").Return(errors.New("connection failed"))
+				check2.On("Ping").Return(errors.New("check2 error"))
 
 				check3 := &MockHealthCheck{}
 				check3.On("Ping").Return(nil)
@@ -64,7 +64,7 @@ func TestService_Ping(t *testing.T) {
 					"check3": check3,
 				}
 			}(),
-			expectedError: errors.New("connection failed"),
+			expectedError: errors.New("check2 error"),
 		},
 		{
 			name: "multiple checks fail",
@@ -73,12 +73,12 @@ func TestService_Ping(t *testing.T) {
 				check1.On("Ping").Return(nil)
 
 				check2 := &MockHealthCheck{}
-				check2.On("Ping").Return(errors.New("cache error"))
+				check2.On("Ping").Return(errors.New("check2 error"))
 
 				check3 := &MockHealthCheck{}
 				check3.On("Ping").Run(func(args mock.Arguments) {
 					time.Sleep(200 * time.Millisecond)
-				}).Return(errors.New("kafka error"))
+				}).Return(errors.New("check3 error"))
 
 				return map[string]HealthCheck{
 					"check1": check1,
@@ -86,7 +86,7 @@ func TestService_Ping(t *testing.T) {
 					"check3": check3,
 				}
 			}(),
-			expectedError: errors.New("cache error"),
+			expectedError: errors.New("check2 error"),
 		},
 		{
 			name: "no checks configured",
