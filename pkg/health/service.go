@@ -35,7 +35,7 @@ func (s *Service) Ping() error {
 		}(name, check)
 	}
 
-	for i := 0; i < len(s.checks); i++ {
+	for range len(s.checks) {
 		res := <-results
 		if res.err != nil {
 			slog.Error("health check failed", "service", res.name, "error", res.err.Error())
