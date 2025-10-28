@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/iamnotrodger/golang-kafka/pkg/app"
+	"github.com/iamnotrodger/golang-kafka/services/producer/cmd/appctx"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/config"
-	"github.com/iamnotrodger/golang-kafka/services/producer/internal/processes"
 )
 
 func main() {
@@ -31,8 +31,8 @@ func run() int {
 	slog.SetDefault(logger)
 
 	ctx, cancel := context.WithCancel(context.Background())
-	appCtx := processes.NewAppContext(ctx)
-	application := app.NewApplication(processes.BuildAppProcesses(appCtx))
+	appCtx := appctx.NewAppContext(ctx)
+	application := app.NewApplication(appctx.BuildAppProcesses(appCtx))
 	errChan := application.Run(ctx)
 	defer close(errChan)
 

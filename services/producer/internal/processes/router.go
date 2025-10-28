@@ -10,7 +10,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/api"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/config"
+	"github.com/iamnotrodger/golang-kafka/services/producer/internal/health"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/metrics"
+	"github.com/iamnotrodger/golang-kafka/services/producer/internal/ticket"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
@@ -18,15 +20,20 @@ type Router struct {
 	server *http.Server
 }
 
-func NewRouter(appCtx *AppContext) *Router {
+type RouterServices struct {
+	HealthService *health.Service
+	TicketService *ticket.Service
+}
+
+func NewRouter(services RouterServices) *Router {
 	engine := gin.New()
 	metrics.MustRegister()
 
 	// g.Use(gin.LoggerWithFormatter(logFormatter), gin.Recovery(), gerror.Handler(), location.Default())
 	engine.NoRoute(api.NotFound())
 
-	healthHandler := api.NewHealthAPI(appCtx.healthService)
-	ticketHandler := api.NewTicketAPI(appCtx.ticketService)
+	healthHandler := api.NewHealthAPI(services.HealthService)
+	ticketHandler := api.NewTicketAPI(services.TicketService)
 
 	engine.Match([]string{"GET", "HEAD"}, "/health", healthHandler.Health)
 	engine.GET("/metrics", gin.WrapH(promhttp.Handler()))

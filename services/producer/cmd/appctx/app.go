@@ -1,10 +1,11 @@
-package processes
+package appctx
 
 import (
 	"context"
 
 	"github.com/iamnotrodger/golang-kafka/pkg/app"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/health"
+	"github.com/iamnotrodger/golang-kafka/services/producer/internal/processes"
 	"github.com/iamnotrodger/golang-kafka/services/producer/internal/ticket"
 )
 
@@ -15,7 +16,10 @@ type AppContext struct {
 
 func BuildAppProcesses(appCtx *AppContext) map[string]app.Runnable {
 	return map[string]app.Runnable{
-		"API": NewRouter(appCtx),
+		"API": processes.NewRouter(processes.RouterServices{
+			HealthService: appCtx.healthService,
+			TicketService: appCtx.ticketService,
+		}),
 	}
 }
 
