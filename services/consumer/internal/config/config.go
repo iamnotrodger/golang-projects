@@ -13,9 +13,12 @@ const (
 	defaultLogLevel         = "info"
 	defaultKafkaBroker      = "localhost:9092"
 	defaultKafkaTicketTopic = "tickets"
+	defaultDatabaseURL      = "postgres://user:password@localhost:5432/tickets"
 )
 
-type Secret struct{}
+type Secret struct {
+	DatabaseURL string `mapstructure:"database_url"`
+}
 
 type Spec struct {
 	*Secret          `json:"-"`
@@ -27,7 +30,9 @@ type Spec struct {
 }
 
 func New() *Spec {
-	secret := &Secret{}
+	secret := &Secret{
+		DatabaseURL: defaultDatabaseURL,
+	}
 	return &Spec{
 		Secret:           secret,
 		Env:              defaultEnv,

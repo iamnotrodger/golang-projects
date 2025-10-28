@@ -13,6 +13,7 @@ func TestGlobal(t *testing.T) {
 	assert.Equal(t, Global.LogLevel, defaultLogLevel)
 	assert.Equal(t, Global.KafkaBroker, defaultKafkaBroker)
 	assert.Equal(t, Global.KafkaTicketTopic, defaultKafkaTicketTopic)
+	assert.Equal(t, Global.Secret.DatabaseURL, defaultDatabaseURL)
 }
 
 func TestLoadConfig(t *testing.T) {
