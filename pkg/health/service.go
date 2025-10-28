@@ -1,11 +1,12 @@
 package health
 
 import (
+	"context"
 	"log/slog"
 )
 
 type HealthCheck interface {
-	Ping() error
+	Ping(ctx context.Context) error
 }
 
 type Service struct {
@@ -21,16 +22,19 @@ type healthCheckResult struct {
 	err  error
 }
 
-func (s *Service) Ping() error {
+func (s *Service) Ping(ctx context.Context) error {
 	if len(s.checks) == 0 {
 		return nil
 	}
+
+	checkCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
 
 	results := make(chan healthCheckResult, len(s.checks))
 
 	for name, check := range s.checks {
 		go func(name string, check HealthCheck) {
-			err := check.Ping()
+			err := check.Ping(checkCtx)
 			results <- healthCheckResult{name: name, err: err}
 		}(name, check)
 	}
@@ -39,6 +43,7 @@ func (s *Service) Ping() error {
 		res := <-results
 		if res.err != nil {
 			slog.Error("health check failed", "service", res.name, "error", res.err.Error())
+			cancel()
 			return res.err
 		}
 	}

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -12,13 +13,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// MockHealthDatabase is a mock implementation of HealthDatabase
 type MockHealthService struct {
 	mock.Mock
 }
 
-func (m *MockHealthService) Ping() error {
-	args := m.Called()
+func (m *MockHealthService) Ping(ctx context.Context) error {
+	args := m.Called(ctx)
 	return args.Error(0)
 }
 

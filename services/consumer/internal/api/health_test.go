@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -17,8 +18,8 @@ type MockHealthService struct {
 	mock.Mock
 }
 
-func (m *MockHealthService) Ping() error {
-	args := m.Called()
+func (m *MockHealthService) Ping(ctx context.Context) error {
+	args := m.Called(ctx)
 	return args.Error(0)
 }
 

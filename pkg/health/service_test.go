@@ -1,6 +1,7 @@
 package health
 
 import (
+	"context"
 	"errors"
 	"testing"
 	"time"
@@ -13,7 +14,7 @@ type MockHealthCheck struct {
 	mock.Mock
 }
 
-func (m *MockHealthCheck) Ping() error {
+func (m *MockHealthCheck) Ping(ctx context.Context) error {
 	args := m.Called()
 	return args.Error(0)
 }
@@ -101,7 +102,7 @@ func TestService_Ping(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			service := NewService(tt.checks)
 
-			err := service.Ping()
+			err := service.Ping(t.Context())
 			require.Equal(t, tt.expectedError, err)
 
 			for _, check := range tt.checks {

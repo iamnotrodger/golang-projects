@@ -1,6 +1,8 @@
 package healthcheck
 
 import (
+	"context"
+
 	"github.com/iamnotrodger/golang-kafka/services/consumer/internal/config"
 	"github.com/segmentio/kafka-go"
 )
@@ -11,7 +13,7 @@ func NewKafkaCheck() *KafkaCheck {
 	return &KafkaCheck{}
 }
 
-func (k *KafkaCheck) Ping() error {
+func (k *KafkaCheck) Ping(ctx context.Context) error {
 	conn, err := kafka.Dial("tcp", config.Global.KafkaBroker)
 	if err != nil {
 		return err
