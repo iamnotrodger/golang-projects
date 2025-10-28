@@ -2,17 +2,20 @@ package appctx
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/iamnotrodger/golang-kafka/pkg/app"
 	"github.com/iamnotrodger/golang-kafka/services/consumer/internal/config"
 	"github.com/iamnotrodger/golang-kafka/services/consumer/internal/health"
 	"github.com/iamnotrodger/golang-kafka/services/consumer/internal/processes"
 	"github.com/iamnotrodger/golang-kafka/services/consumer/internal/ticket"
+	"github.com/jackc/pgx/v5"
 	"github.com/segmentio/kafka-go"
 )
 
 type AppContext struct {
 	kafkaReaderConfig *kafka.ReaderConfig
+	dbClient          *pgx.Conn
 	healthService     *health.Service
 	ticketService     *ticket.Service
 }
@@ -32,12 +35,33 @@ func NewAppContext(ctx context.Context) *AppContext {
 		GroupID: "ticket-consumer-group",
 	}
 
+	appCtx.initDBClient(ctx)
+
+	ticketStore := ticket.NewStore(appCtx.dbClient)
+
 	appCtx.healthService = health.NewService()
-	appCtx.ticketService = ticket.NewService()
+	appCtx.ticketService = ticket.NewService(ticketStore)
 
 	return &appCtx
 }
 
 func (a *AppContext) Shutdown(ctx context.Context) error {
-	return nil
+	slog.Info("shutting down application context")
+
+	err := a.dbClient.Close(ctx)
+	if err != nil {
+		slog.Error("failed to close database connection", "error", err.Error())
+	}
+
+	return err
+}
+
+func (a *AppContext) initDBClient(ctx context.Context) {
+	var err error
+	a.dbClient, err = pgx.Connect(ctx, config.Global.Secret.DatabaseURL)
+
+	if err != nil {
+		slog.Error("failed to connect to database", "error", err.Error())
+		panic(err)
+	}
 }
