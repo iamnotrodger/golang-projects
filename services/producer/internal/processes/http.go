@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/iamnotrodger/golang-kafka/pkg/health"
-	"github.com/iamnotrodger/golang-kafka/services/producer/internal/api"
-	"github.com/iamnotrodger/golang-kafka/services/producer/internal/config"
-	"github.com/iamnotrodger/golang-kafka/services/producer/internal/ticket"
+	"github.com/iamnotrodger/golang-projects/pkg/health"
+	"github.com/iamnotrodger/golang-projects/services/producer/internal/api"
+	"github.com/iamnotrodger/golang-projects/services/producer/internal/config"
+	"github.com/iamnotrodger/golang-projects/services/producer/internal/ticket"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 

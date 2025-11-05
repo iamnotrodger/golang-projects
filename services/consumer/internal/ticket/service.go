@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/iamnotrodger/golang-kafka/pkg/proto/topics"
+	"github.com/iamnotrodger/golang-projects/pkg/proto/topics"
 	"github.com/segmentio/kafka-go"
 	"google.golang.org/protobuf/proto"
 )

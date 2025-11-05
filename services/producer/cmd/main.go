@@ -9,9 +9,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/iamnotrodger/golang-kafka/pkg/app"
-	"github.com/iamnotrodger/golang-kafka/services/producer/cmd/appctx"
-	"github.com/iamnotrodger/golang-kafka/services/producer/internal/config"
+	"github.com/iamnotrodger/golang-projects/pkg/app"
+	"github.com/iamnotrodger/golang-projects/services/producer/cmd/appctx"
+	"github.com/iamnotrodger/golang-projects/services/producer/internal/config"
 )
 
 func main() {

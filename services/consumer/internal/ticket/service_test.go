@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/iamnotrodger/golang-kafka/pkg/proto/topics"
+	"github.com/iamnotrodger/golang-projects/pkg/proto/topics"
 	"github.com/segmentio/kafka-go"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"

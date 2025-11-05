@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/iamnotrodger/golang-kafka/services/producer/internal/config"
-	"github.com/iamnotrodger/golang-kafka/services/producer/internal/model"
-	"github.com/iamnotrodger/golang-kafka/services/producer/internal/writer"
+	"github.com/iamnotrodger/golang-projects/services/producer/internal/config"
+	"github.com/iamnotrodger/golang-projects/services/producer/internal/model"
+	"github.com/iamnotrodger/golang-projects/services/producer/internal/writer"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )

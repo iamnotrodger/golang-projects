@@ -3,7 +3,7 @@ package healthcheck
 import (
 	"context"
 
-	"github.com/iamnotrodger/golang-kafka/services/consumer/internal/config"
+	"github.com/iamnotrodger/golang-projects/services/consumer/internal/config"
 	"github.com/segmentio/kafka-go"
 )
 

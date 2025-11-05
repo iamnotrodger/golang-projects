@@ -1,4 +1,4 @@
-module github.com/iamnotrodger/golang-kafka
+module github.com/iamnotrodger/golang-projects
 
 go 1.25.0
 

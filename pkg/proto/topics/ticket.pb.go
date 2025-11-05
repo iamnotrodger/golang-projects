@@ -100,7 +100,7 @@ const file_proto_topics_ticket_proto_rawDesc = "" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x14\n" +
 	"\x05price\x18\x03 \x01(\x02R\x05price\x129\n" +
 	"\n" +
-	"created_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAtB7Z5github.com/iamnotrodger/golang-kafka/pkg/proto/topicsb\x06proto3"
+	"created_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAtB7Z5github.com/iamnotrodger/golang-projects/pkg/proto/topicsb\x06proto3"
 
 var (
 	file_proto_topics_ticket_proto_rawDescOnce sync.Once

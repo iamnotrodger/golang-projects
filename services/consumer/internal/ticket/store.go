@@ -3,7 +3,7 @@ package ticket
 import (
 	"context"
 
-	"github.com/iamnotrodger/golang-kafka/pkg/proto/topics"
+	"github.com/iamnotrodger/golang-projects/pkg/proto/topics"
 	"github.com/jackc/pgx/v5"
 )
 

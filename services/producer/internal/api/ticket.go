@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/iamnotrodger/golang-kafka/services/producer/internal/model"
+	"github.com/iamnotrodger/golang-projects/services/producer/internal/model"
 )
 
 type ticketService interface {

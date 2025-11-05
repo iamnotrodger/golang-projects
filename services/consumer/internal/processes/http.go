@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/iamnotrodger/golang-kafka/pkg/health"
-	"github.com/iamnotrodger/golang-kafka/services/consumer/internal/api"
-	"github.com/iamnotrodger/golang-kafka/services/consumer/internal/config"
+	"github.com/iamnotrodger/golang-projects/pkg/health"
+	"github.com/iamnotrodger/golang-projects/services/consumer/internal/api"
+	"github.com/iamnotrodger/golang-projects/services/consumer/internal/config"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 

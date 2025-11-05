@@ -3,12 +3,12 @@ package appctx
 import (
 	"context"
 
-	"github.com/iamnotrodger/golang-kafka/pkg/app"
-	"github.com/iamnotrodger/golang-kafka/pkg/health"
-	"github.com/iamnotrodger/golang-kafka/services/producer/internal/healthcheck"
-	"github.com/iamnotrodger/golang-kafka/services/producer/internal/metrics"
-	"github.com/iamnotrodger/golang-kafka/services/producer/internal/processes"
-	"github.com/iamnotrodger/golang-kafka/services/producer/internal/ticket"
+	"github.com/iamnotrodger/golang-projects/pkg/app"
+	"github.com/iamnotrodger/golang-projects/pkg/health"
+	"github.com/iamnotrodger/golang-projects/services/producer/internal/healthcheck"
+	"github.com/iamnotrodger/golang-projects/services/producer/internal/metrics"
+	"github.com/iamnotrodger/golang-projects/services/producer/internal/processes"
+	"github.com/iamnotrodger/golang-projects/services/producer/internal/ticket"
 )
 
 type AppContext struct {
