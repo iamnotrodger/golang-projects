@@ -11,6 +11,9 @@ func TestGlobal(t *testing.T) {
 	assert.Equal(t, Global.Env, defaultEnv)
 	assert.Equal(t, Global.Port, defaultPort)
 	assert.Equal(t, Global.LogLevel, defaultLogLevel)
+	assert.Equal(t, Global.RedisAddr, defaultRedisAddr)
+	assert.Equal(t, Global.RedisDb, defaultRedisDb)
+	assert.Equal(t, Global.RedisPassword, defaultRedisPassword)
 }
 
 func TestLoadConfig(t *testing.T) {

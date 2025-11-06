@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/iamnotrodger/golang-projects/pkg/app"
+	"github.com/iamnotrodger/golang-projects/services/leaderboard/internal/config"
 	"github.com/iamnotrodger/golang-projects/services/leaderboard/internal/leaderboard"
 	"github.com/iamnotrodger/golang-projects/services/leaderboard/internal/processes"
 	"github.com/iamnotrodger/golang-projects/services/leaderboard/internal/score"
@@ -34,8 +35,13 @@ func NewAppContext(ctx context.Context) *AppContext {
 
 	appCtx.engine = gin.New()
 	appCtx.hub = leaderboard.NewHub()
+	appCtx.rdb = redis.NewClient(&redis.Options{
+		Addr:     config.Global.RedisAddr,
+		Password: config.Global.RedisPassword,
+		DB:       config.Global.RedisDb,
+	})
 
-	// TODO: initiate redis connection
+	appCtx.scoreService = score.NewService(appCtx.rdb)
 
 	return &appCtx
 }

@@ -8,27 +8,38 @@ import (
 )
 
 const (
-	defaultEnv      = "development"
-	defaultPort     = 8080
-	defaultLogLevel = "info"
+	defaultEnv           = "development"
+	defaultPort          = 8080
+	defaultLogLevel      = "info"
+	defaultRedisAddr     = "redis:6379"
+	defaultRedisDb       = 0
+	defaultRedisPassword = ""
 )
 
-type Secret struct{}
+type Secret struct {
+	RedisPassword string `mapstructure:"redis_password"`
+}
 
 type Spec struct {
-	*Secret  `json:"-"`
-	Env      string `mapstructure:"env"`
-	Port     int    `mapstructure:"port"`
-	LogLevel string `mapstructure:"log_level"`
+	*Secret   `json:"-"`
+	Env       string `mapstructure:"env"`
+	Port      int    `mapstructure:"port"`
+	LogLevel  string `mapstructure:"log_level"`
+	RedisAddr string `mapstructure:"redis_addr"`
+	RedisDb   int    `mapstructure:"redis_db"`
 }
 
 func New() *Spec {
-	secret := &Secret{}
+	secret := &Secret{
+		RedisPassword: defaultRedisPassword,
+	}
 	return &Spec{
-		Secret:   secret,
-		Env:      defaultEnv,
-		Port:     defaultPort,
-		LogLevel: defaultLogLevel,
+		Secret:    secret,
+		Env:       defaultEnv,
+		Port:      defaultPort,
+		LogLevel:  defaultLogLevel,
+		RedisAddr: defaultRedisAddr,
+		RedisDb:   defaultRedisDb,
 	}
 }
 
