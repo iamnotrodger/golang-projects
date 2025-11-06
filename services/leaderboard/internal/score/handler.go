@@ -31,19 +31,19 @@ func (h *Handler) RegisterRoutes(r *gin.Engine) {
 func (h *Handler) saveScore(c *gin.Context) {
 	var score model.Score
 	if err := c.ShouldBindJSON(&score); err != nil {
-		slog.Error("error binding JSON", "error", err)
+		slog.Error("saveScore error parsing request", "error", err)
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
 	if err := h.service.SaveScore(c.Request.Context(), &score); err != nil {
-		slog.Error("error saving score", "error", err)
+		slog.Error("saveScore error saving score", "error", err.Error())
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 
 	if err := h.service.PublishTopScores(c.Request.Context()); err != nil {
-		slog.Error("error publishing top scores", "error", err)
+		slog.Error("saveScore error publishing top scores", "error", err.Error())
 	}
 
 	c.Status(204)

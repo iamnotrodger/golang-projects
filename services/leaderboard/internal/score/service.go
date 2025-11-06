@@ -25,7 +25,7 @@ func (s *Service) SaveScore(ctx context.Context, score *model.Score) error {
 }
 
 func (s *Service) PublishTopScores(ctx context.Context) error {
-	topScores, err := s.getTopK(ctx, 10)
+	topScores, err := s.GetTopK(ctx, 10)
 	if err != nil {
 		return err
 	}
@@ -38,7 +38,7 @@ func (s *Service) PublishTopScores(ctx context.Context) error {
 	return s.rdb.Publish(ctx, "leaderboard:top10", leaderboardData).Err()
 }
 
-func (s *Service) getTopK(ctx context.Context, k int) ([]model.Score, error) {
+func (s *Service) GetTopK(ctx context.Context, k int) ([]model.Score, error) {
 	results, err := s.rdb.ZRevRangeWithScores(ctx, "leaderboard", 0, int64(k-1)).Result()
 	if err != nil {
 		return nil, err
