@@ -1,7 +1,7 @@
-package score
+package model
 
 type Score struct {
-	Id    string
+	ID    string
 	Name  string
 	Value int
 }

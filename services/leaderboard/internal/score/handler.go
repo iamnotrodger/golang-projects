@@ -1,23 +1,50 @@
 package score
 
 import (
+	"context"
+	"log/slog"
+
 	"github.com/gin-gonic/gin"
+	"github.com/iamnotrodger/golang-projects/services/leaderboard/internal/model"
 )
 
-type Handler struct {
-	service *Service
+type scoreService interface {
+	SaveScore(ctx context.Context, score *model.Score) error
+	PublishTopScores(ctx context.Context) error
 }
 
-func NewHandler(service *Service) *Handler {
+type Handler struct {
+	service scoreService
+}
+
+func NewHandler(service scoreService) *Handler {
 	return &Handler{service: service}
 }
 
 func (h *Handler) RegisterRoutes(r *gin.Engine) {
 	score := r.Group("/score")
 	{
-		score.POST("/", h.CreateScore)
+		score.POST("/", h.saveScore)
 	}
 }
 
-func (h *Handler) CreateScore(c *gin.Context) {
+func (h *Handler) saveScore(c *gin.Context) {
+	var score model.Score
+	if err := c.ShouldBindJSON(&score); err != nil {
+		slog.Error("error binding JSON", "error", err)
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := h.service.SaveScore(c.Request.Context(), &score); err != nil {
+		slog.Error("error saving score", "error", err)
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := h.service.PublishTopScores(c.Request.Context()); err != nil {
+		slog.Error("error publishing top scores", "error", err)
+	}
+
+	c.Status(204)
 }

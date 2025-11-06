@@ -10,30 +10,39 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/iamnotrodger/golang-projects/pkg/health"
 	"github.com/iamnotrodger/golang-projects/services/leaderboard/internal/config"
+	"github.com/iamnotrodger/golang-projects/services/leaderboard/internal/leaderboard"
 	"github.com/iamnotrodger/golang-projects/services/leaderboard/internal/score"
 )
 
 type HttpServer struct {
-	server *http.Server
+	server             *http.Server
+	leaderboardService *leaderboard.Service
 }
 
 type HttpServerServices struct {
-	HealthService *health.Service
-	ScoreService  *score.Service
+	HealthService      *health.Service
+	ScoreService       *score.Service
+	LeaderboardService *leaderboard.Service
 }
 
 func NewHttpServer(engine *gin.Engine, services HttpServerServices) *HttpServer {
 	scoreHandler := score.NewHandler(services.ScoreService)
 	scoreHandler.RegisterRoutes(engine)
 
+	leaderboardHandler := leaderboard.NewHandler(services.LeaderboardService)
+	leaderboardHandler.RegisterRoutes(engine)
+
 	server := &http.Server{
 		Addr:         fmt.Sprintf("0.0.0.0:%v", config.Global.Port),
-		WriteTimeout: 15 * time.Second,
+		WriteTimeout: 0, 
 		ReadTimeout:  15 * time.Second,
 		Handler:      engine,
 	}
 
-	return &HttpServer{server}
+	return &HttpServer{
+		server:             server,
+		leaderboardService: services.LeaderboardService,
+	}
 }
 
 func (h *HttpServer) Run(ctx context.Context, errChan chan error) {
