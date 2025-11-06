@@ -15,33 +15,30 @@ import (
 )
 
 type HttpServer struct {
-	server             *http.Server
-	leaderboardService *leaderboard.Service
+	server *http.Server
 }
 
 type HttpServerServices struct {
-	HealthService      *health.Service
-	ScoreService       *score.Service
-	LeaderboardService *leaderboard.Service
+	HealthService *health.Service
+	ScoreService  *score.Service
 }
 
-func NewHttpServer(engine *gin.Engine, services HttpServerServices) *HttpServer {
+func NewHttpServer(engine *gin.Engine, hub *leaderboard.Hub, services HttpServerServices) *HttpServer {
 	scoreHandler := score.NewHandler(services.ScoreService)
 	scoreHandler.RegisterRoutes(engine)
 
-	leaderboardHandler := leaderboard.NewHandler(services.LeaderboardService)
+	leaderboardHandler := leaderboard.NewHandler(services.ScoreService, hub)
 	leaderboardHandler.RegisterRoutes(engine)
 
 	server := &http.Server{
 		Addr:         fmt.Sprintf("0.0.0.0:%v", config.Global.Port),
-		WriteTimeout: 0, 
+		WriteTimeout: 0,
 		ReadTimeout:  15 * time.Second,
 		Handler:      engine,
 	}
 
 	return &HttpServer{
-		server:             server,
-		leaderboardService: services.LeaderboardService,
+		server: server,
 	}
 }
 
