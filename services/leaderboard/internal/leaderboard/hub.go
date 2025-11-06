@@ -31,9 +31,11 @@ func (h *Hub) UnregisterClient(id string) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
-	clientChan := h.clients[id]
-	close(clientChan)
-	delete(h.clients, id)
+	clientChan, exists := h.clients[id]
+	if exists {
+		close(clientChan)
+		delete(h.clients, id)
+	}
 }
 
 func (h *Hub) Broadcast(scores []model.Score) {
@@ -46,5 +48,16 @@ func (h *Hub) Broadcast(scores []model.Score) {
 		default:
 			slog.Info("client channel full, skipping update", "client_id", id)
 		}
+	}
+}
+
+func (h *Hub) Shutdown() {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	slog.Info("Shutting down hub, closing all client connections", "count", len(h.clients))
+	for id, clientChan := range h.clients {
+		close(clientChan)
+		delete(h.clients, id)
 	}
 }

@@ -46,7 +46,7 @@ func (h *Handler) HandleSSE(c *gin.Context) {
 
 	initialScores, err := h.service.GetTopK(c.Request.Context(), 10)
 	if err != nil {
-		slog.Error("Error getting initial leaderboard", "error", err)
+		slog.Error("error getting initial leaderboard", "error", err)
 	} else {
 		h.sendSSEScores(c.Writer, initialScores)
 	}
@@ -60,8 +60,12 @@ func (h *Handler) HandleSSE(c *gin.Context) {
 			slog.Info("Client disconnected", "id", id)
 			return
 		case <-ticker.C:
-			h.sendSSEMessage(c.Writer, "keepalive:\n\n")
-		case scores := <-clientChan:
+			h.writeSSE(c.Writer, "keepalive:\n\n")
+		case scores, ok := <-clientChan:
+			if !ok {
+				slog.Info("hub closed connection", "id", id)
+				return
+			}
 			h.sendSSEScores(c.Writer, scores)
 		}
 	}
@@ -70,17 +74,13 @@ func (h *Handler) HandleSSE(c *gin.Context) {
 func (h *Handler) sendSSEScores(w http.ResponseWriter, scores []model.Score) {
 	data, err := json.Marshal(scores)
 	if err != nil {
-		slog.Error("Error marshaling scores", "error", err)
+		slog.Error("error marshaling scores", "error", err)
 		return
 	}
-
-	fmt.Fprintf(w, "data: %s\n\n", data)
-	if flusher, ok := w.(http.Flusher); ok {
-		flusher.Flush()
-	}
+	h.writeSSE(w, fmt.Sprintf("data: %s\n\n", data))
 }
 
-func (h *Handler) sendSSEMessage(w http.ResponseWriter, message any) {
+func (h *Handler) writeSSE(w http.ResponseWriter, message string) {
 	fmt.Fprint(w, message)
 	if flusher, ok := w.(http.Flusher); ok {
 		flusher.Flush()

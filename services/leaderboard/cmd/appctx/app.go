@@ -47,5 +47,8 @@ func NewAppContext(ctx context.Context) *AppContext {
 }
 
 func (a *AppContext) Shutdown(ctx context.Context) error {
+	if err := a.rdb.Close(); err != nil {
+		return err
+	}
 	return nil
 }

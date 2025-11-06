@@ -16,6 +16,7 @@ import (
 
 type HttpServer struct {
 	server *http.Server
+	hub    *leaderboard.Hub
 }
 
 type HttpServerServices struct {
@@ -42,6 +43,7 @@ func NewHttpServer(engine *gin.Engine, hub *leaderboard.Hub, services HttpServer
 
 	return &HttpServer{
 		server: server,
+		hub:    hub,
 	}
 }
 
@@ -56,6 +58,10 @@ func (h *HttpServer) start(errChan chan error) {
 
 func (h *HttpServer) stop(ctx context.Context) {
 	<-ctx.Done()
+
+	slog.Info("shutting down http server")
+
+	h.hub.Shutdown()
 
 	shutdownCtx := context.Background()
 	if err := h.server.Shutdown(shutdownCtx); err != nil {
