@@ -2,6 +2,7 @@ package appctx
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/gin-gonic/gin"
 	"github.com/iamnotrodger/golang-projects/pkg/app"
@@ -48,6 +49,7 @@ func NewAppContext(ctx context.Context) *AppContext {
 
 func (a *AppContext) Shutdown(ctx context.Context) error {
 	if err := a.rdb.Close(); err != nil {
+		slog.Error("error closing redis client", "error", err.Error())
 		return err
 	}
 	return nil
