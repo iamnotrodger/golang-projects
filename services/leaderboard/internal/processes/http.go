@@ -24,6 +24,9 @@ type HttpServerServices struct {
 }
 
 func NewHttpServer(engine *gin.Engine, hub *leaderboard.Hub, services HttpServerServices) *HttpServer {
+	engine.StaticFile("/", "./web/index.html")
+	engine.Static("/web", "./web")
+
 	scoreHandler := score.NewHandler(services.ScoreService)
 	scoreHandler.RegisterRoutes(engine)
 

@@ -39,6 +39,7 @@ func (h *LeaderboardSubscriber) start(ctx context.Context, errChan chan error) {
 		select {
 		case <-ctx.Done():
 			errChan <- ctx.Err()
+			return
 		case msg := <-ch:
 			var scores []model.Score
 			if err := json.Unmarshal([]byte(msg.Payload), &scores); err != nil {

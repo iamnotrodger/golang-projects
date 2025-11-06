@@ -11,7 +11,7 @@ const (
 	defaultEnv           = "development"
 	defaultPort          = 8080
 	defaultLogLevel      = "info"
-	defaultRedisAddr     = "redis:6379"
+	defaultRedisAddr     = "localhost:6379"
 	defaultRedisDb       = 0
 	defaultRedisPassword = ""
 )
