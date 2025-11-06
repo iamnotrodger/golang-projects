@@ -12,18 +12,22 @@ import (
 	"github.com/iamnotrodger/golang-projects/services/leaderboard/internal/model"
 )
 
-type leaderboardService interface {
-	RegisterClient(id string) chan []model.Score
-	UnregisterClient(id string)
+type Service interface {
 	GetTopK(ctx context.Context, k int) ([]model.Score, error)
 }
 
-type Handler struct {
-	service leaderboardService
+type leaderboardHub interface {
+	RegisterClient(id string) chan []model.Score
+	UnregisterClient(id string)
 }
 
-func NewHandler(service leaderboardService) *Handler {
-	return &Handler{service: service}
+type Handler struct {
+	service Service
+	hub     leaderboardHub
+}
+
+func NewHandler(service Service, hub leaderboardHub) *Handler {
+	return &Handler{service: service, hub: hub}
 }
 
 func (h *Handler) RegisterRoutes(engine *gin.Engine) {
@@ -37,8 +41,8 @@ func (h *Handler) HandleSSE(c *gin.Context) {
 	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 
 	id := c.Request.RemoteAddr
-	clientChan := h.service.RegisterClient(id)
-	defer h.service.UnregisterClient(id)
+	clientChan := h.hub.RegisterClient(id)
+	defer h.hub.UnregisterClient(id)
 
 	initialScores, err := h.service.GetTopK(c.Request.Context(), 10)
 	if err != nil {
