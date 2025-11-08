@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/iamnotrodger/golang-projects/pkg/health"
 	"github.com/iamnotrodger/golang-projects/services/leaderboard/internal/config"
+	"github.com/iamnotrodger/golang-projects/services/leaderboard/internal/healthcheck"
 	"github.com/iamnotrodger/golang-projects/services/leaderboard/internal/leaderboard"
 	"github.com/iamnotrodger/golang-projects/services/leaderboard/internal/score"
 )
@@ -33,6 +34,9 @@ func NewHttpServer(engine *gin.Engine, hub *leaderboard.Hub, services HttpServer
 
 	leaderboardHandler := leaderboard.NewHandler(services.ScoreService, hub)
 	leaderboardHandler.RegisterRoutes(engine)
+
+	healthHandler := healthcheck.NewHandler(services.HealthService)
+	healthHandler.RegisterRoutes(engine)
 
 	server := &http.Server{
 		Addr:         fmt.Sprintf("0.0.0.0:%v", config.Global.Port),

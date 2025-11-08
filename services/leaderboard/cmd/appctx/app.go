@@ -6,7 +6,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/iamnotrodger/golang-projects/pkg/app"
+	"github.com/iamnotrodger/golang-projects/pkg/health"
 	"github.com/iamnotrodger/golang-projects/services/leaderboard/internal/config"
+	"github.com/iamnotrodger/golang-projects/services/leaderboard/internal/healthcheck"
 	"github.com/iamnotrodger/golang-projects/services/leaderboard/internal/leaderboard"
 	"github.com/iamnotrodger/golang-projects/services/leaderboard/internal/processes"
 	"github.com/iamnotrodger/golang-projects/services/leaderboard/internal/score"
@@ -14,15 +16,17 @@ import (
 )
 
 type AppContext struct {
-	engine       *gin.Engine
-	rdb          *redis.Client
-	hub          *leaderboard.Hub
-	scoreService *score.Service
+	engine        *gin.Engine
+	rdb           *redis.Client
+	hub           *leaderboard.Hub
+	scoreService  *score.Service
+	healthService *health.Service
 }
 
 func BuildAppProcesses(appCtx *AppContext) map[string]app.Runnable {
 	httpServices := processes.HttpServerServices{
-		ScoreService: appCtx.scoreService,
+		ScoreService:  appCtx.scoreService,
+		HealthService: appCtx.healthService,
 	}
 
 	return map[string]app.Runnable{
@@ -43,6 +47,9 @@ func NewAppContext(ctx context.Context) *AppContext {
 	})
 
 	appCtx.scoreService = score.NewService(appCtx.rdb)
+	appCtx.healthService = health.NewService(map[string]health.HealthCheck{
+		"redis": healthcheck.NewRedisCheck(appCtx.rdb),
+	})
 
 	return &appCtx
 }
