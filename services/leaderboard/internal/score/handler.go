@@ -10,7 +10,8 @@ import (
 
 type scoreService interface {
 	SaveScore(ctx context.Context, score *model.Score) error
-	PublishTopScores(ctx context.Context) error
+	GetTopK(ctx context.Context, k int) ([]model.Score, error)
+	PublishTopScores(ctx context.Context, topScores []model.Score) error
 }
 
 type Handler struct {
@@ -42,9 +43,15 @@ func (h *Handler) saveScore(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.PublishTopScores(c.Request.Context()); err != nil {
-		slog.Error("saveScore error publishing top scores", "error", err.Error())
+	c.Status(204)
+
+	topScores, err := h.service.GetTopK(c.Request.Context(), 10)
+	if err != nil {
+		slog.Error("saveScore error getting top scores", "error", err.Error())
+		return
 	}
 
-	c.Status(204)
+	if err := h.service.PublishTopScores(c.Request.Context(), topScores); err != nil {
+		slog.Error("saveScore error publishing top scores", "error", err.Error())
+	}
 }
