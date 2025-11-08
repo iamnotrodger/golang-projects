@@ -57,12 +57,12 @@ func (runnable *MockRunnable) Terminated() bool {
 }
 
 func TestApplication(t *testing.T) {
-	type testDef struct {
+	type testCase struct {
 		name      string
 		processes map[string]Runnable
 	}
 
-	tests := []testDef{
+	tests := []testCase{
 		{
 			name: "should start all processes, and stop them gracefully",
 			processes: map[string]Runnable{

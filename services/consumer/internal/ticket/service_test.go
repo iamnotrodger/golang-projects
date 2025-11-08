@@ -24,7 +24,7 @@ func (m *MockTicketStore) CreateTicket(ctx context.Context, ticket *topics.Ticke
 }
 
 func TestHandleMessage(t *testing.T) {
-	type testDef struct {
+	type testCase struct {
 		name          string
 		message       kafka.Message
 		store         *MockTicketStore
@@ -39,7 +39,7 @@ func TestHandleMessage(t *testing.T) {
 	}
 	validTicketBytes, _ := proto.Marshal(validTicket)
 
-	tests := []testDef{
+	tests := []testCase{
 		{
 			name: "successfully handles valid message",
 			message: kafka.Message{

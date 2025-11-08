@@ -13,13 +13,13 @@ import (
 )
 
 func TestCreateTicket(t *testing.T) {
-	type testDef struct {
+	type testCase struct {
 		name          string
 		ticket        *model.Ticket
 		expectedError error
 	}
 
-	tests := []testDef{
+	tests := []testCase{
 		{
 			name: "valid ticket",
 			ticket: &model.Ticket{

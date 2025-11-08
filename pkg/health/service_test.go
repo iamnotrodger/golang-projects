@@ -20,13 +20,13 @@ func (m *MockHealthCheck) Ping(ctx context.Context) error {
 }
 
 func TestService_Ping(t *testing.T) {
-	type testDef struct {
+	type testCase struct {
 		name          string
 		checks        map[string]HealthCheck
 		expectedError error
 	}
 
-	tests := []testDef{
+	tests := []testCase{
 		{
 			name: "all checks pass",
 			checks: func() map[string]HealthCheck {
