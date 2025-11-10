@@ -45,13 +45,16 @@ func (h *Handler) saveScore(c *gin.Context) {
 
 	c.Status(204)
 
-	topScores, err := h.service.GetTopK(c.Request.Context(), 10)
-	if err != nil {
-		slog.Error("saveScore error getting top scores", "error", err.Error())
-		return
-	}
+	go func(ctx context.Context) {
+		ctx = context.WithoutCancel(ctx)
+		topScores, err := h.service.GetTopK(ctx, 10)
+		if err != nil {
+			slog.Error("saveScore error getting top scores", "error", err.Error())
+			return
+		}
 
-	if err := h.service.PublishTopScores(c.Request.Context(), topScores); err != nil {
-		slog.Error("saveScore error publishing top scores", "error", err.Error())
-	}
+		if err := h.service.PublishTopScores(ctx, topScores); err != nil {
+			slog.Error("saveScore error publishing top scores", "error", err.Error())
+		}
+	}(c.Request.Context())
 }
