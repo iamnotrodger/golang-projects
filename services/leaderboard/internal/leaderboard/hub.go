@@ -42,6 +42,8 @@ func (h *Hub) Broadcast(scores []model.Score) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
+	slog.Info("broadcasting scores", "count", len(scores))
+
 	for id, clientChan := range h.clients {
 		select {
 		case clientChan <- scores:

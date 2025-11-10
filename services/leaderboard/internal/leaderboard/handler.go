@@ -57,7 +57,7 @@ func (h *Handler) HandleSSE(c *gin.Context) {
 	for {
 		select {
 		case <-c.Request.Context().Done():
-			slog.Info("Client disconnected", "id", id)
+			slog.Info("client disconnected", "id", id)
 			return
 		case <-ticker.C:
 			h.writeSSE(c.Writer, "keepalive:\n\n")
@@ -77,6 +77,7 @@ func (h *Handler) sendSSEScores(w http.ResponseWriter, scores []model.Score) {
 		slog.Error("error marshaling scores", "error", err)
 		return
 	}
+	slog.Info("sending scores", "scores", scores)
 	h.writeSSE(w, fmt.Sprintf("data: %s\n\n", data))
 }
 
